@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class JdbcMunicipalityRepository implements MunicipalityRepository {
 
-    private static final String INSERT_MUNICIPALITY_QUERY = "INSERT INTO Municipality(municipalityName) VALUES(?)";
-    private static final String UPDATE_MUNICIPALITY_BY_ID_QUERY = "UPDATE Municipality SET municipalityName=? WHERE municipalityID=?";
+    private static final String INSERT_MUNICIPALITY_QUERY = "INSERT INTO Municipalities (municipality_name) VALUES(?)";
+    private static final String UPDATE_MUNICIPALITY_BY_ID_QUERY = "UPDATE Municipalities SET municipality_name=? WHERE municipalityID=?";
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

@@ -7,20 +7,20 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/municipalities")
 public class MunicipalityController {
 
     @Autowired
     MunicipalityRepository municipalityRepository;
 
-    @PostMapping("/municipalities")
+    @PostMapping("/")
     public Municipality createMunicipality(@RequestBody Municipality municipality) {
         return municipalityRepository.create(municipality);
     }
 
-    @PutMapping("/municipalities/{id}")
-    public Municipality updateMunicipality(@RequestBody Municipality municipality, @PathVariable("id") long id) {
-        
+    @PutMapping("/{municipalityID}")
+    public Municipality updateMunicipality(@PathVariable Long municipalityID, @RequestBody Municipality municipality) {
+        municipality.setMunicipalityID(municipalityID);
         return municipalityRepository.update(municipality);
     }
 }
