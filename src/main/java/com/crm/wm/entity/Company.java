@@ -1,5 +1,7 @@
 package com.crm.wm.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,21 +12,21 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "Roles")
+@Table(name = "Companies")
 @Data
-public class Role {
+public class Company {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roleID;
+    private Long companyID;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private ERole name;
+    private String companyName;
 
-    public Role(ERole name) {
-        this.name = name;
-    }
+    @OneToOne
+    @JoinColumn(name = "customerID")
+    @JsonIgnore
+    private Customer customer;
 
     // Other fields, constructors, getters, setters
+
 }
