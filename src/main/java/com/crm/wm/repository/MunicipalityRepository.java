@@ -1,6 +1,6 @@
 package com.crm.wm.repository;
 
-import com.crm.wm.entity.Municipality;
+import com.crm.wm.entities.Municipality;
 
 import java.util.List;
 

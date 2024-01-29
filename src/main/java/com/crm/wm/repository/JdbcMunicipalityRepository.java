@@ -1,6 +1,6 @@
 package com.crm.wm.repository;
 
-import com.crm.wm.entity.Municipality;
+import com.crm.wm.entities.Municipality;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
