@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,6 +36,14 @@ public class Customer {
 
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL)
     private Company company;
+
+    @ManyToMany
+    @JoinTable(
+            name = "Customer_Product",
+            joinColumns = @JoinColumn(name = "CustomerID"),
+            inverseJoinColumns = @JoinColumn(name = "ProductID")
+    )
+    private List<Product> products;
 
     // Other fields, constructors, getters, setters
 

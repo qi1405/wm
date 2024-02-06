@@ -31,6 +31,8 @@ public class Invoice {
 
     private Date invoiceDate;
 
+    private Double totalAmount;
+
     @OneToMany(mappedBy = "invoice")
     private List<InvoiceItem> invoiceItems;
 
