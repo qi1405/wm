@@ -22,6 +22,11 @@ public class Product {
     private String description;
     private Double price;
 
+    // Define the relationship with Customer
+    @ManyToOne
+    @JoinColumn(name = "customerID")
+    private Customer customer;
+
     @ManyToOne
     @JoinColumn(name = "MunicipalityID")
     private Municipality municipality;

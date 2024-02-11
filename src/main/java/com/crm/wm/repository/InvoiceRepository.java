@@ -12,4 +12,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     // You can add custom queries if needed
 
     boolean existsByCustomerAndInvoiceDate(Customer customer, Date invoiceDate);
+    boolean existsByCustomerAndMonth(Customer customer, Date month);
 }

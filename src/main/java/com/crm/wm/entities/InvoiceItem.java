@@ -26,6 +26,7 @@ public class InvoiceItem {
     @JoinColumn(name = "ProductID")
     private Product product;
 
+    private Double price;
     private Integer quantity;
     private Double totalPrice;
 

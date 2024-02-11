@@ -23,7 +23,7 @@ public class MunicipalityController {
     }
 
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    @GetMapping
+    @GetMapping("/")
     public List<Municipality> readAllMunicipalities() {
         return municipalityRepository.readAll();
     }

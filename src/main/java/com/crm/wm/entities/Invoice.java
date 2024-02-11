@@ -31,6 +31,8 @@ public class Invoice {
 
     private Date invoiceDate;
 
+    private Date month;
+
     private Double totalAmount;
 
     @OneToMany(mappedBy = "invoice")

@@ -1,0 +1,73 @@
+--> insert customer, type company:
+    {
+      "customer": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "phoneNumber": "123-456-7890",
+        "address": "123 Main St",
+        "municipality": {
+          "municipalityID": 1,
+          "municipalityName": "Sample Municipality"
+        },
+        "customerType": "COMPANY",
+        "company": {
+        "companyName": "ABC Corp"
+      }
+      },
+      "productIds": [1]
+    }
+
+--> insert customer, type individual:
+    {
+      "customer": {
+        "firstName": "John",
+        "lastName": "Doe",
+        "email": "john.doe@example.com",
+        "phoneNumber": "123-456-7890",
+        "address": "123 Main St",
+        "municipality": {
+          "municipalityID": 1,
+          "municipalityName": "Sample Municipality"
+        },
+        "customerType": "INDIVIDUAL"
+      },
+      "productIds": [1]
+    }
+
+--> insert municipality:
+    {
+      "municipalityName": "Sample Municipality"
+    }
+
+--> insert product:
+    {
+      "productName": "Sample Product",
+      "description": "This is a sample product description.",
+      "price": 29.99,
+      "municipality": {
+        "municipalityID": 1,
+        "municipalityName": "Sample Municipality"
+      }
+    }
+
+--> insert a new user (employee):
+    {
+      "username": "username",
+      "password": "password",
+      "email": "email@email.com",
+      "role": ["user", "mod", "admin"]
+    }
+
+--> sign in:
+    {
+      "username": "username",
+      "password": "password"
+    }
+
+ --> insert invoice manually
+    {
+      "customerId": 1,
+      "employeeId": 1,
+      "month": "2024-02-01"
+    }
