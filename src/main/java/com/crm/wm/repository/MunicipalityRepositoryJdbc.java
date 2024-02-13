@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class JdbcMunicipalityRepository implements MunicipalityRepository {
+public class MunicipalityRepositoryJdbc implements MunicipalityRepository {
 
     private static final String INSERT_MUNICIPALITY_QUERY = "INSERT INTO Municipalities (municipality_name) VALUES(?)";
 

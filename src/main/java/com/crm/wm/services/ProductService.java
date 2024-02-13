@@ -19,17 +19,18 @@ public class ProductService {
 
     // Other dependencies...
 
-    public Map<Long, Double> getPricesForProductsAssociatedWithCustomer(Customer customer) {
-        // Assuming you have a method in the ProductRepository to fetch products associated with a customer
-        List<Product> products = productRepository.findByCustomer(customer);
-
-        // Assuming each product has a price field
-        Map<Long, Double> productPrices = new HashMap<>();
-        for (Product product : products) {
-            productPrices.put(product.getProductID(), product.getPrice());
-        }
-        return productPrices;
-    }
+//    public Map<Long, Double> getPricesForProductsAssociatedWithCustomer(Customer customer) {
+//        Long customerId = customer.getCustomerID(); // Extract the customer ID
+//        // Assuming you have a method in the ProductRepository to fetch products associated with a customer
+//        List<Product> products = productRepository.findByCustomer(customerId);
+//
+//        // Assuming each product has a price field
+//        Map<Long, Double> productPrices = new HashMap<>();
+//        for (Product product : products) {
+//            productPrices.put(product.getProductID(), product.getPrice());
+//        }
+//        return productPrices;
+//    }
 
     // Other methods...
 }

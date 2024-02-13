@@ -32,5 +32,9 @@ public class Municipality {
     @OneToMany(mappedBy = "municipality")
     private List<Product> products;
 
+    public Municipality(long municipalityID) {
+        this.municipalityID = municipalityID;
+    }
+
     // Other fields, constructors, getters, setters
 }

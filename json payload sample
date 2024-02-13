@@ -7,8 +7,7 @@
         "phoneNumber": "123-456-7890",
         "address": "123 Main St",
         "municipality": {
-          "municipalityID": 1,
-          "municipalityName": "Sample Municipality"
+          "municipalityID": 1
         },
         "customerType": "COMPANY",
         "company": {
@@ -27,8 +26,7 @@
         "phoneNumber": "123-456-7890",
         "address": "123 Main St",
         "municipality": {
-          "municipalityID": 1,
-          "municipalityName": "Sample Municipality"
+          "municipalityID": 1
         },
         "customerType": "INDIVIDUAL"
       },
