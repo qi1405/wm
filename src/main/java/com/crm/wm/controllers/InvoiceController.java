@@ -1,22 +1,12 @@
 package com.crm.wm.controllers;
 
-import com.crm.wm.entities.Customer;
-import com.crm.wm.entities.Invoice;
-import com.crm.wm.entities.Product;
-import com.crm.wm.repository.CustomerRepository;
-import com.crm.wm.repository.ProductRepository;
-import com.crm.wm.services.InvoiceGenerationException;
-import com.crm.wm.services.InvoiceRequest;
+import com.crm.wm.dto.InvoiceDTO;
+import com.crm.wm.dto.InvoiceGenerationRequest;
 import com.crm.wm.services.InvoiceService;
-import com.crm.wm.services.ProductWithQuantity;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -26,75 +16,15 @@ public class InvoiceController {
     @Autowired
     private InvoiceService invoiceService;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    @PostMapping("/generate")
+    public ResponseEntity<InvoiceDTO> generateInvoice(@RequestBody InvoiceGenerationRequest request) {
+        InvoiceDTO invoiceDTO = invoiceService.generateInvoice(
+                request.getCustomerId(),
+                request.getEmployeeId(),
+                request.getProductIds()
+        );
+        return ResponseEntity.ok(invoiceDTO);
+    }
 
-    @Autowired
-    private ProductRepository productRepository;
-
-   // @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-//    @PostMapping("/generate")
-//    public ResponseEntity<String> generateInvoiceManually(@RequestBody InvoiceRequest invoiceRequest) {
-//        // Extract data from the request object
-//        Long customerId = invoiceRequest.getCustomerId();
-//        Long employeeId = invoiceRequest.getEmployeeId();
-//        Date month = invoiceRequest.getMonth();
-//        List<Long> productIds = invoiceRequest.getProductIds();
-//        List<Integer> quantities = invoiceRequest.getQuantities();
-//
-//        Customer customer = customerRepository.findById(customerId)
-//                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
-//
-//        try {
-//            // Fetch products based on provided productIds
-//            List<Product> products = productRepository.findAllById(productIds);
-//
-//            // Prepare products with quantities
-//            List<ProductWithQuantity> productsWithQuantity;
-//            if (quantities != null && quantities.size() == productIds.size()) {
-//                productsWithQuantity = InvoiceControllerUtil.mapProductsWithQuantities(products, quantities);
-//            } else {
-//                productsWithQuantity = InvoiceControllerUtil.mapProductsWithQuantities(products);
-//            }
-//
-//            // Generate the invoice manually and add the selected products
-//            Invoice generatedInvoice = invoiceService.generateInvoiceManually(customer, null, employeeId, month, productsWithQuantity);
-//            return ResponseEntity.ok("Invoice generated successfully. Invoice ID: " + generatedInvoice.getInvoiceID());
-//        } catch (InvoiceGenerationException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-
-//    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-//    @PostMapping("/generate")
-//    public ResponseEntity<String> generateInvoiceManually(
-//            @RequestParam Long customerID,
-//            @RequestParam Long employeeID,
-//            @RequestParam @DateTimeFormat(pattern = "yyyy-MM") Date month,
-//            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date invoiceDate,
-//            @RequestParam List<Long> productIds,
-//            @RequestParam(required = false) List<Integer> quantities) {
-//
-//        Customer customer = customerRepository.findById(customerID)
-//                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
-//
-//        try {
-//            // Fetch products based on provided productIds
-//            List<Product> products = productRepository.findAllById(productIds);
-//
-//            // Prepare products with quantities
-//            List<ProductWithQuantity> productsWithQuantity;
-//            if (quantities != null && quantities.size() == productIds.size()) {
-//                productsWithQuantity = InvoiceControllerUtil.mapProductsWithQuantities(products, quantities);
-//            } else {
-//                productsWithQuantity = InvoiceControllerUtil.mapProductsWithQuantities(products);
-//            }
-//
-//            // Generate the invoice manually and add the selected products
-//            Invoice generatedInvoice = invoiceService.generateInvoiceManually(customer, invoiceDate, employeeID, month, productsWithQuantity);
-//            return ResponseEntity.ok("Invoice generated successfully. Invoice ID: " + generatedInvoice.getInvoiceID());
-//        } catch (InvoiceGenerationException e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
+    // Add more endpoints as needed
 }

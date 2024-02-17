@@ -27,8 +27,24 @@ public class InvoiceItem {
     private Product product;
 
     private Double price;
+
     private Integer quantity;
+
     private Double totalPrice;
 
     // Other fields, constructors, getters, setters
+
+    public InvoiceItem(Product product, Integer quantity) {
+        this.product = product;
+        this.quantity = quantity;
+        this.price = product.getPrice();  // Assuming you have a method getPrice() in your Product class
+        this.totalPrice = calculateTotalPrice();
+    }
+
+    // Calculate total price directly in the constructor
+    private Double calculateTotalPrice() {
+        return price * quantity;
+    }
+
+    // Other methods
 }

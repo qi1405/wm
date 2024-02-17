@@ -29,6 +29,10 @@ public class Invoice {
     @JoinColumn(name = "EmployeeID")
     private Employee employee;
 
+    @ManyToOne
+    @JoinColumn(name = "MunicipalityID")
+    private Municipality municipality;
+
     private Date invoiceDate;
 
     private Date month;
@@ -37,6 +41,7 @@ public class Invoice {
 
     @OneToMany(mappedBy = "invoice")
     private List<InvoiceItem> invoiceItems;
+
 
     // Other fields, constructors, getters, setters
 }

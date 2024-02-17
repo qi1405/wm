@@ -24,8 +24,8 @@ public class CustomerDTO {
     private String phoneNumber;
     private String address;
     private CustomerType customerType;
-    private MunicipalityDTO municipality;
     private CompanyDTO company;
+    private MunicipalityDTO municipality;
 
     public CustomerDTO(Customer customer) {
         this.customerID = customer.getCustomerID();
@@ -35,10 +35,8 @@ public class CustomerDTO {
         this.phoneNumber = customer.getPhoneNumber();
         this.address = customer.getAddress();
         this.customerType = customer.getCustomerType();
-        this.municipality = new MunicipalityDTO(customer.getMunicipality());
-
         if (customer.getCustomerType() == CustomerType.COMPANY && customer.getCompany() != null) {
-            this.company = new CompanyDTO(customer.getCompany());
-        }
+            this.company = new CompanyDTO(customer.getCompany());}
+        this.municipality = new MunicipalityDTO(customer.getMunicipality());
     }
 }

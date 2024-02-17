@@ -19,8 +19,8 @@ public class MunicipalityDTO {
     private String municipalityName;
 
     public MunicipalityDTO(Municipality municipality) {
-        this.municipalityID = getMunicipalityID();
-        this.municipalityName = getMunicipalityName();
+        this.municipalityID = municipality.getMunicipalityID();
+        this.municipalityName = municipality.getMunicipalityName();
     }
 
     // Constructors, getters, setters

@@ -2,15 +2,18 @@ package com.crm.wm.controllers;
 
 import com.crm.wm.dto.CustomerDTO;
 import com.crm.wm.dto.CustomerProductAssociationRequest;
+import com.crm.wm.entities.Company;
 import com.crm.wm.entities.Customer;
 import com.crm.wm.entities.CustomerType;
 import com.crm.wm.entities.Product;
 import com.crm.wm.repository.CustomerRepository;
 import com.crm.wm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,7 +44,7 @@ public class CustomerController {
         }
 
         // Fetch products by their IDs
-        List<Product> products = productRepository.findAllById(productIds); // Assuming productService is available
+        List<Product> products = productRepository.findAllById(productIds);
 
         // Associate the products with the customer
         customer.setProducts(products);
@@ -57,46 +60,48 @@ public class CustomerController {
         return ResponseEntity.ok(customerDTOs);
     }
 
-  //  @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-//    @PutMapping("/{customerId}")
-//    public ResponseEntity<Customer> updateCustomer(@PathVariable Long customerId, @RequestBody Customer updatedCustomer) {
-//        Optional<Customer> existingCustomerOptional = customerRepository.findById(customerId);
-//
-//        if (existingCustomerOptional.isPresent()) {
-//            Customer existingCustomer = existingCustomerOptional.get();
-//
-//            // Update customer fields
-//            existingCustomer.setFirstName(updatedCustomer.getFirstName());
-//            existingCustomer.setLastName(updatedCustomer.getLastName());
-//            existingCustomer.setEmail(updatedCustomer.getEmail());
-//            existingCustomer.setPhoneNumber(updatedCustomer.getPhoneNumber());
-//            existingCustomer.setAddress(updatedCustomer.getAddress());
-//            existingCustomer.setMunicipality(updatedCustomer.getMunicipality());
-//            existingCustomer.setCustomerType(updatedCustomer.getCustomerType());
-//
-//            // Update associated company information
-//            Company existingCompany = existingCustomer.getCompany();
-//            Company updatedCompany = updatedCustomer.getCompany();
-//
-//            if (existingCompany != null && updatedCompany != null) {
-//                existingCompany.setCompanyName(updatedCompany.getCompanyName());
-//                // Update other company fields as needed
-//            } else if (existingCompany == null && updatedCompany != null) {
-//                updatedCompany.setCustomer(existingCustomer);
-//                existingCustomer.setCompany(updatedCompany);
-//            } else if (existingCompany != null && updatedCompany == null) {
-//                existingCompany.setCustomer(null);
-//                existingCustomer.setCompany(null);
-//            }
-//
-//            // Save the updated customer
-//            Customer savedCustomer = customerRepository.save(existingCustomer);
-//
-//            return new ResponseEntity<>(savedCustomer, HttpStatus.OK);
-//        } else {
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//
-//    }
-    // Add more endpoints as needed
-}
+    // Update customer details
+
+        //  @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+        @PutMapping("/{id}")
+        public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerProductAssociationRequest request) {
+            // Find the customer by ID
+            Optional<Customer> customerOptional = customerRepository.findById(id);
+            if (customerOptional.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            Customer customer = customerOptional.get();
+
+            // Update the customer fields from the request
+            Customer updatedCustomer = request.getCustomer();
+            if (updatedCustomer == null) {
+                return ResponseEntity.badRequest().body("Customer details are required.");
+            }
+            customer.setFirstName(updatedCustomer.getFirstName());
+            customer.setLastName(updatedCustomer.getLastName());
+            customer.setEmail(updatedCustomer.getEmail());
+            customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
+            customer.setAddress(updatedCustomer.getAddress());
+            customer.setMunicipality(updatedCustomer.getMunicipality());
+            customer.setCustomerType(updatedCustomer.getCustomerType());
+            customer.setCompany(updatedCustomer.getCompany());
+
+            // Check if customer type is INDIVIDUAL and there are company details
+            if (customer.getCustomerType() == CustomerType.INDIVIDUAL && customer.getCompany() != null) {
+                return ResponseEntity.badRequest().body("Individual customer cannot have company details.");
+            }
+
+            // Fetch products by their IDs
+            List<Long> productIds = request.getProductIds();
+            List<Product> products = productRepository.findAllById(productIds);
+
+            // Associate the products with the customer
+            customer.setProducts(products);
+            customerRepository.save(customer);
+
+            return ResponseEntity.ok("Customer updated and all products associated with the customer successfully.");
+        }
+
+
+        // Add more endpoints as needed
+    }
