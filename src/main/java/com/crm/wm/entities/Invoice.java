@@ -39,9 +39,8 @@ public class Invoice {
 
     private Double totalAmount;
 
-    @OneToMany(mappedBy = "invoice")
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)  // Added cascade for automatic persistence
     private List<InvoiceItem> invoiceItems;
-
 
     // Other fields, constructors, getters, setters
 }

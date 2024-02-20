@@ -14,6 +14,38 @@ import lombok.ToString;
 @Data
 public class InvoiceItem {
 
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long invoiceItemID;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "InvoiceID")
+//    private Invoice invoice;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "ProductID")
+//    private Product product;
+//
+//    private Double price;
+//
+//    private Integer quantity;
+//
+//    private Double totalPrice;
+//
+//    // Other fields, constructors, getters, setters
+//
+//    public InvoiceItem(Product product, Integer quantity) {
+//        this.product = product;
+//        this.quantity = quantity;
+//        this.price = product.getPrice();  // Assuming you have a method getPrice() in your Product class
+//        this.totalPrice = calculateTotalPrice();
+//    }
+//
+//    // Calculate total price directly in the constructor
+//    private Double calculateTotalPrice() {
+//        return price * quantity;
+//    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long invoiceItemID;
@@ -37,11 +69,10 @@ public class InvoiceItem {
     public InvoiceItem(Product product, Integer quantity) {
         this.product = product;
         this.quantity = quantity;
-        this.price = product.getPrice();  // Assuming you have a method getPrice() in your Product class
+        this.price = product.getPrice();
         this.totalPrice = calculateTotalPrice();
     }
 
-    // Calculate total price directly in the constructor
     private Double calculateTotalPrice() {
         return price * quantity;
     }

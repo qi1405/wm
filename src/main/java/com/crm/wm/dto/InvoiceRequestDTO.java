@@ -12,5 +12,14 @@ public class InvoiceRequestDTO {
     private Long municipalityId;
     private Date month;
     private Date invoiceDate; // Add this field
-    private List<Long> additionalProducts; // Add this field for additional product IDs
-}
+    private List<ProductIdDTO> additionalProducts;
+
+    // Getters and setters
+
+    public List<ProductIdDTO> getAdditionalProducts() {
+        return additionalProducts;
+    }
+
+    public void setAdditionalProducts(List<ProductIdDTO> additionalProducts) {
+        this.additionalProducts = additionalProducts;
+    }}
