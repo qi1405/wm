@@ -1,6 +1,8 @@
 package com.crm.wm.dto;
 
+import com.crm.wm.dto.serialize_deserialize.CustomDateDeserializer;
 import com.crm.wm.dto.serialize_deserialize.CustomDateSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
@@ -12,8 +14,9 @@ public class InvoiceRequestDTO {
     private Long customerId;
     private Long employeeId;
     private Long municipalityId;
-    @JsonSerialize(using = CustomDateSerializer.class)
-    private List<String> months;
+//    @JsonSerialize(using = CustomDateSerializer.class)
+//    @JsonDeserialize(using = CustomDateDeserializer.class)
+    private String months;
     private List<ProductIdDTO> additionalProducts;
     private Boolean isPaid;
 

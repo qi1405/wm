@@ -15,19 +15,19 @@ public class InvoiceResponseDTO {
     private Double totalAmount;
     private Long customerId;
     private Long employeeId;
-    @JsonDeserialize(using = CustomDateDeserializer.class)
-    private List<String> months;
+//    @JsonDeserialize(using = CustomDateDeserializer.class)
+    private String month;
     private Long municipalityId;
     private Boolean isPaid;
 
     // Constructor
-    public InvoiceResponseDTO(Long invoiceId, Date invoiceDate, Double totalAmount, Long customerId, Long employeeId, List<String> months, Long municipalityId, Boolean isPaid) {
+    public InvoiceResponseDTO(Long invoiceId, Date invoiceDate, Double totalAmount, Long customerId, Long employeeId, String months, Long municipalityId, Boolean isPaid) {
         this.invoiceId = invoiceId;
         this.invoiceDate = invoiceDate;
         this.totalAmount = totalAmount;
         this.customerId = customerId;
         this.employeeId = employeeId;
-        this.months = months;
+        this.month = months;
         this.municipalityId = municipalityId;
         this.isPaid = isPaid;
     }

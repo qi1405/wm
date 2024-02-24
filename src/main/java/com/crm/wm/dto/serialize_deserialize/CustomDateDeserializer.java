@@ -27,7 +27,7 @@ public class CustomDateDeserializer extends StdDeserializer<Date> {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         String dateString = node.textValue();
         try {
-            return dateFormat.parse(dateString);
+            return dateString != null ? dateFormat.parse(dateString) : null;
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }

@@ -59,7 +59,7 @@ public class InvoiceService {
             invoice.setEmployee(entityManager.find(Employee.class, requestDTO.getEmployeeId()));
             invoice.setMunicipality(entityManager.find(Municipality.class, requestDTO.getMunicipalityId()));
             invoice.setInvoiceDate(new Date());
-            invoice.setMonths(requestDTO.getMonths()); // Assuming it's a List<String> of months
+            invoice.setMonth(requestDTO.getMonths());
             invoice.setTotalAmount(totalAmount);
             invoice.setIsPaid(false);  // Assuming it's not paid initially
 

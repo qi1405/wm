@@ -16,6 +16,10 @@ public class CustomDateSerializer extends JsonSerializer<Date> {
 
     @Override
     public void serialize(Date date, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        jsonGenerator.writeString(dateFormat.format(date));
+        if (date != null) {
+            jsonGenerator.writeString(dateFormat.format(date));
+        } else {
+            jsonGenerator.writeNull();
+        }
     }
 }
