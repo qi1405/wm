@@ -50,5 +50,8 @@
         @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL)  // Added cascade for automatic persistence
         private List<InvoiceItem> invoiceItems;
 
+        public void setMonths(List<String> months) {
+        }
+
         // Other fields, constructors, getters, setters
     }

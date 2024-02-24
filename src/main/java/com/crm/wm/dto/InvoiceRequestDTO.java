@@ -12,18 +12,12 @@ public class InvoiceRequestDTO {
     private Long customerId;
     private Long employeeId;
     private Long municipalityId;
-    private List<String> months;
-    private Date invoiceDate;
-    private List<ProductIdDTO> additionalProducts;
     @JsonSerialize(using = CustomDateSerializer.class)
+    private List<String> months;
+    private List<ProductIdDTO> additionalProducts;
     private Boolean isPaid;
 
     // Getters and setters
-
-
-    public String getMonths() {
-        return months;
-    }
 
     public List<ProductIdDTO> getAdditionalProducts() {
         return additionalProducts;
@@ -31,4 +25,5 @@ public class InvoiceRequestDTO {
 
     public void setAdditionalProducts(List<ProductIdDTO> additionalProducts) {
         this.additionalProducts = additionalProducts;
-    }}
+    }
+}

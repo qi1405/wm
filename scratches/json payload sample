@@ -64,23 +64,50 @@
     }
 
  --> insert invoice manually
-    {
-      "customerId": 1,
-      "employeeId": 1,
-      "municipalityId": 1,
-      "month": "2024-02-17",
-      "isPaid": false
-    }
+[
+  {
+    "customerId": 11,
+    "employeeId": 1,
+    "municipalityId": 2,
+    "months": ["2023-12", "2024-01"],
+    "isPaid": false
+  }
+]
 
 --> insert invoice manually, multiple products
+[
+  {
+    "customerId": 11,
+    "employeeId": 1,
+    "municipalityId": 2,
+    "months": ["2023-12", "2024-01"],
+    "additionalProducts": [
+      {"productId": 2}
+    ],
+    "isPaid": false
+  }
+]
+
+--> insert invoice manually, multiple products, multiple months
+[
+  {
+    "customerId": 11,
+    "employeeId": 1,
+    "municipalityId": 2,
+    "months": ["2024-01"],
+    "additionalProducts": [
+      {"productId": 2}
+    ],
+    "isPaid": false
+  },
     {
       "customerId": 11,
       "employeeId": 1,
       "municipalityId": 2,
-      "month": "2024-02-14",
+      "months": ["2024-02"],
       "additionalProducts": [
-        {"productId": 2},
-        {"productId": 3}
+        {"productId": 2}
       ],
       "isPaid": false
     }
+]

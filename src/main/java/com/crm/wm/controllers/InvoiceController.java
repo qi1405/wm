@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/api/invoices")
 public class InvoiceController {
@@ -31,19 +30,10 @@ public class InvoiceController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<InvoiceResponseDTO> generateInvoice(@RequestBody InvoiceRequestDTO requestDTO) {
-        InvoiceResponseDTO responseDTO = invoiceService.generateInvoice(requestDTO);
-        return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    public ResponseEntity<List<InvoiceResponseDTO>> generateInvoices(@RequestBody List<InvoiceRequestDTO> requestDTOs) {
+        List<InvoiceResponseDTO> responseDTOs = invoiceService.generateInvoices(requestDTOs);
+        return new ResponseEntity<>(responseDTOs, HttpStatus.CREATED);
     }
-
-//    @PutMapping("/update-is-paid/{invoiceId}")
-//    public ResponseEntity<String> updateIsPaidStatus(
-//            @PathVariable Long invoiceId,
-//            @RequestParam boolean isPaid
-//    ) {
-//        invoiceService.updateIsPaidStatus(invoiceId, isPaid);
-//        return new ResponseEntity<>("IsPaid status updated successfully", HttpStatus.OK);
-//    }
 
     @PutMapping("/update-is-paid/{invoiceId}")
     public ResponseEntity<String> updateIsPaidStatus(@PathVariable Long invoiceId, @RequestBody boolean isPaid) {

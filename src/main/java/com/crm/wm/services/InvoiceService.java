@@ -36,56 +36,62 @@ public class InvoiceService {
     }
 
     @Transactional
-    public InvoiceResponseDTO generateInvoice(InvoiceRequestDTO requestDTO) {
-        Customer customer = entityManager.find(Customer.class, requestDTO.getCustomerId());
+    public List<InvoiceResponseDTO> generateInvoices(List<InvoiceRequestDTO> requestDTOs) {
+        List<InvoiceResponseDTO> responseDTOs = new ArrayList<>();
 
-        // Fetch the default product associated with the customer
-        String nativeQuery = "SELECT p.* FROM Customer_Product cp " +
-                "JOIN Products p ON cp.ProductID = p.ProductID " +
-                "WHERE cp.CustomerID = :customerId";
-        Product defaultProduct = (Product) entityManager.createNativeQuery(nativeQuery, Product.class)
-                .setParameter("customerId", requestDTO.getCustomerId())
-                .getSingleResult();
+        for (InvoiceRequestDTO requestDTO : requestDTOs) {
+            Customer customer = entityManager.find(Customer.class, requestDTO.getCustomerId());
 
-        // Calculate the total amount including the default product and additional products (if provided)
-        Double totalAmount = calculateTotalAmount(defaultProduct.getPrice(), customer.getProducts(), requestDTO.getAdditionalProducts());
+            // Fetch the default product associated with the customer
+            String nativeQuery = "SELECT p.* FROM Customer_Product cp " +
+                    "JOIN Products p ON cp.ProductID = p.ProductID " +
+                    "WHERE cp.CustomerID = :customerId";
+            Product defaultProduct = (Product) entityManager.createNativeQuery(nativeQuery, Product.class)
+                    .setParameter("customerId", requestDTO.getCustomerId())
+                    .getSingleResult();
 
-        // Create and save the invoice with the current date and time
-        Invoice invoice = new Invoice();
-        invoice.setCustomer(customer);
-        invoice.setEmployee(entityManager.find(Employee.class, requestDTO.getEmployeeId()));
-        invoice.setMunicipality(entityManager.find(Municipality.class, requestDTO.getMunicipalityId()));
-        invoice.setInvoiceDate(new Date());
-        invoice.setMonth(requestDTO.getMonths());
-        invoice.setTotalAmount(totalAmount);
-        invoice.setIsPaid(false);  // Assuming it's not paid initially
+            // Calculate the total amount including the default product and additional products (if provided)
+            Double totalAmount = calculateTotalAmount(defaultProduct.getPrice(), customer.getProducts(), requestDTO.getAdditionalProducts());
 
-        // Create and associate InvoiceItem entity for the default product
-        InvoiceItem defaultProductItem = new InvoiceItem(defaultProduct, 1); // Assuming quantity is 1 for the default product
-        defaultProductItem.setInvoice(invoice);
+            // Create and save the invoice with the current date and time
+            Invoice invoice = new Invoice();
+            invoice.setCustomer(customer);
+            invoice.setEmployee(entityManager.find(Employee.class, requestDTO.getEmployeeId()));
+            invoice.setMunicipality(entityManager.find(Municipality.class, requestDTO.getMunicipalityId()));
+            invoice.setInvoiceDate(new Date());
+            invoice.setMonths(requestDTO.getMonths()); // Assuming it's a List<String> of months
+            invoice.setTotalAmount(totalAmount);
+            invoice.setIsPaid(false);  // Assuming it's not paid initially
 
-        // Create and associate InvoiceItem entities for additional products
-        List<InvoiceItem> additionalProductItems = createInvoiceItems(requestDTO.getAdditionalProducts());
-        additionalProductItems.forEach(item -> item.setInvoice(invoice));
+            // Create and associate InvoiceItem entity for the default product
+            InvoiceItem defaultProductItem = new InvoiceItem(defaultProduct, 1); // Assuming quantity is 1 for the default product
+            defaultProductItem.setInvoice(invoice);
 
-        List<InvoiceItem> allInvoiceItems = new ArrayList<>();
-        allInvoiceItems.add(defaultProductItem);
-        allInvoiceItems.addAll(additionalProductItems);
+            // Create and associate InvoiceItem entities for additional products
+            List<InvoiceItem> additionalProductItems = createInvoiceItems(requestDTO.getAdditionalProducts());
+            additionalProductItems.forEach(item -> item.setInvoice(invoice));
 
-        invoice.setInvoiceItems(allInvoiceItems);
+            List<InvoiceItem> allInvoiceItems = new ArrayList<>();
+            allInvoiceItems.add(defaultProductItem);
+            allInvoiceItems.addAll(additionalProductItems);
 
-        entityManager.persist(invoice);
+            invoice.setInvoiceItems(allInvoiceItems);
 
-        return new InvoiceResponseDTO(
-                invoice.getInvoiceID(),
-                invoice.getInvoiceDate(),
-                totalAmount,
-                customer.getCustomerID(),
-                requestDTO.getEmployeeId(),
-                requestDTO.getMonths(),
-                requestDTO.getMunicipalityId(),
-                invoice.getIsPaid()
-        );
+            entityManager.persist(invoice);
+
+            responseDTOs.add(new InvoiceResponseDTO(
+                    invoice.getInvoiceID(),
+                    invoice.getInvoiceDate(),
+                    totalAmount,
+                    customer.getCustomerID(),
+                    requestDTO.getEmployeeId(),
+                    requestDTO.getMonths(),
+                    requestDTO.getMunicipalityId(),
+                    invoice.getIsPaid()
+            ));
+        }
+
+        return responseDTOs;
     }
 
     private List<InvoiceItem> createInvoiceItems(List<ProductIdDTO> additionalProductIds) {
@@ -113,7 +119,8 @@ public class InvoiceService {
         // Add the prices of additional products (if provided)
         if (additionalProducts != null) {
             for (Product product : additionalProducts) {
-                totalAmount = product.getPrice();
+                totalAmount
+                        = product.getPrice();
             }
         }
 
