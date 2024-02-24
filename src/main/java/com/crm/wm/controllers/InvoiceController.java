@@ -24,10 +24,31 @@ public class InvoiceController {
         return new ResponseEntity<>(invoices, HttpStatus.OK);
     }
 
+    @GetMapping("/list/customer/{customerId}")
+    public ResponseEntity<List<InvoiceResponseDTO>> getInvoicesByCustomer(@PathVariable Long customerId) {
+        List<InvoiceResponseDTO> invoices = invoiceService.getInvoicesByCustomer(customerId);
+        return new ResponseEntity<>(invoices, HttpStatus.OK);
+    }
+
     @PostMapping("/generate")
     public ResponseEntity<InvoiceResponseDTO> generateInvoice(@RequestBody InvoiceRequestDTO requestDTO) {
         InvoiceResponseDTO responseDTO = invoiceService.generateInvoice(requestDTO);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+    }
+
+//    @PutMapping("/update-is-paid/{invoiceId}")
+//    public ResponseEntity<String> updateIsPaidStatus(
+//            @PathVariable Long invoiceId,
+//            @RequestParam boolean isPaid
+//    ) {
+//        invoiceService.updateIsPaidStatus(invoiceId, isPaid);
+//        return new ResponseEntity<>("IsPaid status updated successfully", HttpStatus.OK);
+//    }
+
+    @PutMapping("/update-is-paid/{invoiceId}")
+    public ResponseEntity<String> updateIsPaidStatus(@PathVariable Long invoiceId, @RequestBody boolean isPaid) {
+        invoiceService.updateIsPaidStatus(invoiceId, isPaid);
+        return new ResponseEntity<>("IsPaid status updated successfully", HttpStatus.OK);
     }
 
     // Add more endpoints as needed

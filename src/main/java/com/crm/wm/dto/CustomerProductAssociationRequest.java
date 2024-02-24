@@ -1,7 +1,6 @@
 package com.crm.wm.dto;
 
 import com.crm.wm.entities.Customer;
-
 import java.util.List;
 
 public class CustomerProductAssociationRequest {

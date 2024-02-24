@@ -22,8 +22,16 @@ public class InvoiceService {
 
     @Transactional(readOnly = true)
     public List<InvoiceResponseDTO> getAllInvoices() {
-        String jpql = "SELECT NEW com.crm.wm.dto.InvoiceResponseDTO(i.invoiceID, i.invoiceDate, i.totalAmount, i.customer.customerID, i.employee.employeeID, i.month, i.municipality.municipalityID) FROM Invoice i";
+        String jpql = "SELECT NEW com.crm.wm.dto.InvoiceResponseDTO(i.invoiceID, i.invoiceDate, i.totalAmount, i.customer.customerID, i.employee.employeeID, i.month, i.municipality.municipalityID, i.isPaid) FROM Invoice i";
         TypedQuery<InvoiceResponseDTO> query = entityManager.createQuery(jpql, InvoiceResponseDTO.class);
+        return query.getResultList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvoiceResponseDTO> getInvoicesByCustomer(Long customerId) {
+        String jpql = "SELECT NEW com.crm.wm.dto.InvoiceResponseDTO(i.invoiceID, i.invoiceDate, i.totalAmount, i.customer.customerID, i.employee.employeeID, i.month, i.municipality.municipalityID, i.isPaid) FROM Invoice i WHERE i.customer.customerID = :customerId";
+        TypedQuery<InvoiceResponseDTO> query = entityManager.createQuery(jpql, InvoiceResponseDTO.class);
+        query.setParameter("customerId", customerId);
         return query.getResultList();
     }
 
@@ -48,8 +56,9 @@ public class InvoiceService {
         invoice.setEmployee(entityManager.find(Employee.class, requestDTO.getEmployeeId()));
         invoice.setMunicipality(entityManager.find(Municipality.class, requestDTO.getMunicipalityId()));
         invoice.setInvoiceDate(new Date());
-        invoice.setMonth(requestDTO.getMonth());
+        invoice.setMonth(requestDTO.getMonths());
         invoice.setTotalAmount(totalAmount);
+        invoice.setIsPaid(false);  // Assuming it's not paid initially
 
         // Create and associate InvoiceItem entity for the default product
         InvoiceItem defaultProductItem = new InvoiceItem(defaultProduct, 1); // Assuming quantity is 1 for the default product
@@ -73,8 +82,9 @@ public class InvoiceService {
                 totalAmount,
                 customer.getCustomerID(),
                 requestDTO.getEmployeeId(),
-                requestDTO.getMonth(),
-                requestDTO.getMunicipalityId()
+                requestDTO.getMonths(),
+                requestDTO.getMunicipalityId(),
+                invoice.getIsPaid()
         );
     }
 
@@ -118,5 +128,18 @@ public class InvoiceService {
         }
 
         return totalAmount;
+    }
+
+    @Transactional
+    public void updateIsPaidStatus(Long invoiceId, boolean isPaid) {
+        Invoice invoice = entityManager.find(Invoice.class, invoiceId);
+        if (invoice != null) {
+            invoice.setPaid(isPaid);
+            // Optionally, you can update other fields or perform additional logic here
+            entityManager.merge(invoice);
+        } else {
+            // Handle the case where the invoice with the given ID is not found
+            throw new IllegalArgumentException("Invoice with ID " + invoiceId + " not found");
+        }
     }
 }

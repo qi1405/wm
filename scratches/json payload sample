@@ -68,17 +68,19 @@
       "customerId": 1,
       "employeeId": 1,
       "municipalityId": 1,
-      "month": "2024-02-17"
+      "month": "2024-02-17",
+      "isPaid": false
     }
 
 --> insert invoice manually, multiple products
     {
-      "customerId": 1,
-      "employeeId": 2,
-      "municipalityId": 3,
-      "month": "2024-02-17",
+      "customerId": 11,
+      "employeeId": 1,
+      "municipalityId": 2,
+      "month": "2024-02-14",
       "additionalProducts": [
-        {"productId": 4},
-        {"productId": 6}
-      ]
+        {"productId": 2},
+        {"productId": 3}
+      ],
+      "isPaid": false
     }
