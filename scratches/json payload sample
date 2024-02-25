@@ -69,7 +69,7 @@
     "customerId": 11,
     "employeeId": 1,
     "municipalityId": 2,
-    "months": ["2023-12", "2024-01"],
+    "months": 2024-01",
     "isPaid": false
   }
 ]
@@ -80,9 +80,12 @@
     "customerId": 11,
     "employeeId": 1,
     "municipalityId": 2,
-    "months": ["2023-12", "2024-01"],
+    "months": 2024-01",
     "additionalProducts": [
-      {"productId": 2}
+      {
+      "productId": 2,
+      "quantity": 3
+       }
     ],
     "isPaid": false
   }
@@ -96,7 +99,10 @@
     "municipalityId": 2,
     "months": ["2024-01"],
     "additionalProducts": [
-      {"productId": 2}
+            {
+            "productId": 2,
+            "quantity": 3
+             }
     ],
     "isPaid": false
   },
@@ -106,7 +112,10 @@
       "municipalityId": 2,
       "months": ["2024-02"],
       "additionalProducts": [
-        {"productId": 2}
+              {
+              "productId": 2,
+              "quantity": 3
+               }
       ],
       "isPaid": false
     }
