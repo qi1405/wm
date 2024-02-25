@@ -42,6 +42,14 @@ public class InvoiceService {
         for (InvoiceRequestDTO requestDTO : requestDTOs) {
             Customer customer = entityManager.find(Customer.class, requestDTO.getCustomerId());
 
+            // Check if an invoice already exists for the given customer and month
+            if (invoiceExistsForCustomerAndMonth(customer, requestDTO.getMonths())) {
+                // Handle the case where an invoice already exists
+                // You can throw an exception or handle it according to your business logic
+                // For example:
+                throw new IllegalArgumentException("Invoice already exists for customer " + requestDTO.getCustomerId() + " in month " + requestDTO.getMonths());
+            }
+
             // Fetch the default product associated with the customer
             String nativeQuery = "SELECT p.* FROM Customer_Product cp " +
                     "JOIN Products p ON cp.ProductID = p.ProductID " +
@@ -148,5 +156,13 @@ public class InvoiceService {
             // Handle the case where the invoice with the given ID is not found
             throw new IllegalArgumentException("Invoice with ID " + invoiceId + " not found");
         }
+    }
+
+    private boolean invoiceExistsForCustomerAndMonth(Customer customer, String month) {
+        String jpql = "SELECT COUNT(i) FROM Invoice i WHERE i.customer = :customer AND i.month = :month";
+        TypedQuery<Long> query = entityManager.createQuery(jpql, Long.class);
+        query.setParameter("customer", customer);
+        query.setParameter("month", month);
+        return query.getSingleResult() > 0;
     }
 }
