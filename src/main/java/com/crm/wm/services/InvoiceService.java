@@ -1,6 +1,7 @@
 package com.crm.wm.services;
 
 import com.crm.wm.dto.InvoiceRequestDTO;
+import com.crm.wm.dto.InvoiceRequestWithoutDefaultDTO;
 import com.crm.wm.dto.InvoiceResponseDTO;
 import com.crm.wm.dto.ProductIdDTO;
 import com.crm.wm.entities.*;
@@ -100,6 +101,81 @@ public class InvoiceService {
         }
 
         return responseDTOs;
+    }
+
+    @Transactional
+    public List<InvoiceResponseDTO> generateInvoicesWithoutDefault(List<InvoiceRequestWithoutDefaultDTO> requestDTOs) {
+        List<InvoiceResponseDTO> responseDTOs = new ArrayList<>();
+
+        for (InvoiceRequestWithoutDefaultDTO requestDTO : requestDTOs) {
+            Customer customer = entityManager.find(Customer.class, requestDTO.getCustomerId());
+
+            // Check if the request contains at least one product
+            if (requestDTO.getProductIds() == null || requestDTO.getProductIds().isEmpty()) {
+                throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
+            }
+
+            // Fetch products based on productIds
+            List<Product> products = entityManager
+                    .createQuery("SELECT p FROM Product p WHERE p.productID IN :productIds", Product.class)
+                    .setParameter("productIds", requestDTO.getProductIds())
+                    .getResultList();
+
+            // Calculate the total amount based on the products
+            Double totalAmount = calculateTotalAmountRandInv(products);
+
+            // Create and save the invoice with the current date and time
+            Invoice invoice = new Invoice();
+            invoice.setCustomer(customer);
+            invoice.setEmployee(entityManager.find(Employee.class, requestDTO.getEmployeeId()));
+            invoice.setMunicipality(entityManager.find(Municipality.class, requestDTO.getMunicipalityId()));
+            invoice.setInvoiceDate(new Date());
+            invoice.setTotalAmount(totalAmount);
+            invoice.setIsPaid(false);  // Assuming it's not paid initially
+
+            // Create and associate InvoiceItem entities for products
+            List<InvoiceItem> productItems = createInvoiceItemsRandInv(products);
+            productItems.forEach(item -> item.setInvoice(invoice));
+
+            invoice.setInvoiceItems(productItems);
+
+            entityManager.persist(invoice);
+
+            responseDTOs.add(new InvoiceResponseDTO(
+                    invoice.getInvoiceID(),
+                    invoice.getInvoiceDate(),
+                    totalAmount,
+                    customer.getCustomerID(),
+                    requestDTO.getEmployeeId(),
+                    null,  // No month for this type of invoice
+                    requestDTO.getMunicipalityId(),
+                    invoice.getIsPaid()
+            ));
+        }
+
+        return responseDTOs;
+    }
+
+    private List<InvoiceItem> createInvoiceItemsRandInv(List<Product> products) {
+        if (products == null || products.isEmpty()) {
+            throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
+        }
+
+        List<InvoiceItem> invoiceItems = new ArrayList<>();
+
+        for (Product product : products) {
+            InvoiceItem invoiceItem = new InvoiceItem(product, 1);  // Assuming quantity is 1
+            invoiceItems.add(invoiceItem);
+        }
+
+        return invoiceItems;
+    }
+
+    private Double calculateTotalAmountRandInv(List<Product> products) {
+        // Calculate total amount by summing up the prices of products
+        return products.stream()
+                .mapToDouble(Product::getPrice)
+                .sum();
     }
 
     private List<InvoiceItem> createInvoiceItems(List<ProductIdDTO> additionalProductIds) {

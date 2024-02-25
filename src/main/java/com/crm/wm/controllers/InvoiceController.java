@@ -1,6 +1,7 @@
 package com.crm.wm.controllers;
 
 import com.crm.wm.dto.InvoiceRequestDTO;
+import com.crm.wm.dto.InvoiceRequestWithoutDefaultDTO;
 import com.crm.wm.dto.InvoiceResponseDTO;
 import com.crm.wm.services.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,12 @@ public class InvoiceController {
     public ResponseEntity<String> updateIsPaidStatus(@PathVariable Long invoiceId, @RequestBody boolean isPaid) {
         invoiceService.updateIsPaidStatus(invoiceId, isPaid);
         return new ResponseEntity<>("IsPaid status updated successfully", HttpStatus.OK);
+    }
+
+    @PostMapping("/generate-without-default")
+    public ResponseEntity<List<InvoiceResponseDTO>> generateInvoicesWithoutDefault(@RequestBody List<InvoiceRequestWithoutDefaultDTO> requestDTOs) {
+        List<InvoiceResponseDTO> responseDTOs = invoiceService.generateInvoicesWithoutDefault(requestDTOs);
+        return new ResponseEntity<>(responseDTOs, HttpStatus.CREATED);
     }
 
     // Add more endpoints as needed

@@ -111,3 +111,23 @@
       "isPaid": false
     }
 ]
+
+--> insert random invoices, which do not have default product and month
+[
+  {
+    "customerId": 10,
+    "employeeId": 1,
+    "municipalityId": 2,
+    "productIds": [1, 3],
+    "isPaid": false
+  },
+  {
+    "customerId": 11,
+    "employeeId": 1,
+    "municipalityId": 1,
+    "productIds": [2, 3],
+    "isPaid": true
+  }
+]
+
+-->
