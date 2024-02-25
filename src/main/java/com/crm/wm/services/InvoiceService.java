@@ -1,9 +1,6 @@
 package com.crm.wm.services;
 
-import com.crm.wm.dto.InvoiceRequestDTO;
-import com.crm.wm.dto.InvoiceRequestWithoutDefaultDTO;
-import com.crm.wm.dto.InvoiceResponseDTO;
-import com.crm.wm.dto.ProductIdDTO;
+import com.crm.wm.dto.*;
 import com.crm.wm.entities.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -12,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -178,17 +176,18 @@ public class InvoiceService {
                 .sum();
     }
 
-    private List<InvoiceItem> createInvoiceItems(List<ProductIdDTO> additionalProductIds) {
-        if (additionalProductIds == null) {
-            return List.of();  // Return an empty list if no additional products
+    private List<InvoiceItem> createInvoiceItems(List<InvoiceItemRequestDTO> additionalProductDTOs) {
+        if (additionalProductDTOs == null || additionalProductDTOs.isEmpty()) {
+            return Collections.emptyList();
         }
 
         List<InvoiceItem> invoiceItems = new ArrayList<>();
 
-        for (ProductIdDTO productIdDTO : additionalProductIds) {
-            Product additionalProduct = entityManager.find(Product.class, productIdDTO.getProductId());
+        for (InvoiceItemRequestDTO productDTO : additionalProductDTOs) {
+            Product additionalProduct = entityManager.find(Product.class, productDTO.getProductId());
             if (additionalProduct != null) {
-                InvoiceItem invoiceItem = new InvoiceItem(additionalProduct, 1);  // Assuming quantity is 1
+                Integer quantity = productDTO.getQuantity() != null ? productDTO.getQuantity() : 1;
+                InvoiceItem invoiceItem = new InvoiceItem(additionalProduct, quantity);
                 invoiceItems.add(invoiceItem);
             }
         }
@@ -196,24 +195,24 @@ public class InvoiceService {
         return invoiceItems;
     }
 
-    private Double calculateTotalAmount(Double defaultProductPrice, List<Product> additionalProducts, List<ProductIdDTO> additionalProductIds) {
+    private Double calculateTotalAmount(Double defaultProductPrice, List<Product> additionalProducts, List<InvoiceItemRequestDTO> additionalProductDTOs) {
         // Calculate total amount by starting with the default product price
         double totalAmount = defaultProductPrice;
 
         // Add the prices of additional products (if provided)
         if (additionalProducts != null) {
             for (Product product : additionalProducts) {
-                totalAmount
-                        = product.getPrice();
+                totalAmount = product.getPrice();
             }
         }
 
         // Include additional products specified in the request by IDs (if provided)
-        if (additionalProductIds != null) {
-            for (ProductIdDTO productIdDTO : additionalProductIds) {
-                Product additionalProduct = entityManager.find(Product.class, productIdDTO.getProductId());
+        if (additionalProductDTOs != null) {
+            for (InvoiceItemRequestDTO productDTO : additionalProductDTOs) {
+                Product additionalProduct = entityManager.find(Product.class, productDTO.getProductId());
                 if (additionalProduct != null) {
-                    totalAmount += additionalProduct.getPrice();
+                    Integer quantity = productDTO.getQuantity() != null ? productDTO.getQuantity() : 1;
+                    totalAmount += additionalProduct.getPrice() * quantity;
                 }
             }
         }

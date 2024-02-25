@@ -17,16 +17,16 @@ public class InvoiceRequestDTO {
 //    @JsonSerialize(using = CustomDateSerializer.class)
 //    @JsonDeserialize(using = CustomDateDeserializer.class)
     private String months;
-    private List<ProductIdDTO> additionalProducts;
+    private List<InvoiceItemRequestDTO> additionalProducts;
     private Boolean isPaid;
 
     // Getters and setters
 
-    public List<ProductIdDTO> getAdditionalProducts() {
-        return additionalProducts;
-    }
-
-    public void setAdditionalProducts(List<ProductIdDTO> additionalProducts) {
-        this.additionalProducts = additionalProducts;
-    }
+//    public List<ProductIdDTO> getAdditionalProducts() {
+//        return additionalProducts;
+//    }
+//
+//    public void setAdditionalProducts(List<ProductIdDTO> additionalProducts) {
+//        this.additionalProducts = additionalProducts;
+//    }
 }
