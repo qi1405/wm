@@ -127,15 +127,33 @@
     "customerId": 10,
     "employeeId": 1,
     "municipalityId": 2,
-    "productIds": [1, 3],
+    "invoiceItemRequestDTOs": [
+      {
+        "productId": 1,
+        "quantity": 2
+      },
+      {
+        "productId": 3,
+        "quantity": 1
+      }
+    ],
     "isPaid": false
   },
   {
     "customerId": 11,
     "employeeId": 1,
     "municipalityId": 1,
-    "productIds": [2, 3],
-    "isPaid": true
+    "invoiceItemRequestDTOs": [
+      {
+        "productId": 2,
+        "quantity": 1
+      },
+      {
+        "productId": 3,
+        "quantity": 3
+      }
+    ],
+    "isPaid": false
   }
 ]
 

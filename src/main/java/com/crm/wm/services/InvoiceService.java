@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InvoiceService {
@@ -109,18 +110,30 @@ public class InvoiceService {
             Customer customer = entityManager.find(Customer.class, requestDTO.getCustomerId());
 
             // Check if the request contains at least one product
-            if (requestDTO.getProductIds() == null || requestDTO.getProductIds().isEmpty()) {
+            if (requestDTO.getInvoiceItemRequestDTOs() == null || requestDTO.getInvoiceItemRequestDTOs().isEmpty()) {
                 throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
             }
 
             // Fetch products based on productIds
             List<Product> products = entityManager
                     .createQuery("SELECT p FROM Product p WHERE p.productID IN :productIds", Product.class)
-                    .setParameter("productIds", requestDTO.getProductIds())
+                    .setParameter("productIds", requestDTO.getInvoiceItemRequestDTOs().stream()
+                            .map(InvoiceItemRequestDTO::getProductId)
+                            .collect(Collectors.toList()))
                     .getResultList();
 
-            // Calculate the total amount based on the products
-            Double totalAmount = calculateTotalAmountRandInv(products);
+            // Check if the number of products and quantities match
+            if (products.size() != requestDTO.getInvoiceItemRequestDTOs().size()) {
+                throw new IllegalArgumentException("Number of products and quantities should match.");
+            }
+
+            // Extract quantities from the DTO
+            List<Integer> quantities = requestDTO.getInvoiceItemRequestDTOs().stream()
+                    .map(InvoiceItemRequestDTO::getQuantity)
+                    .collect(Collectors.toList());
+
+            // Calculate the total amount based on the products and quantities
+            Double totalAmount = calculateTotalAmountRandInv(products, quantities);
 
             // Create and save the invoice with the current date and time
             Invoice invoice = new Invoice();
@@ -132,7 +145,7 @@ public class InvoiceService {
             invoice.setIsPaid(false);  // Assuming it's not paid initially
 
             // Create and associate InvoiceItem entities for products
-            List<InvoiceItem> productItems = createInvoiceItemsRandInv(products);
+            List<InvoiceItem> productItems = createInvoiceItemsRandInv(products, quantities);
             productItems.forEach(item -> item.setInvoice(invoice));
 
             invoice.setInvoiceItems(productItems);
@@ -154,26 +167,55 @@ public class InvoiceService {
         return responseDTOs;
     }
 
-    private List<InvoiceItem> createInvoiceItemsRandInv(List<Product> products) {
+    private List<InvoiceItem> createInvoiceItemsRandInv(List<Product> products, List<Integer> quantities) {
         if (products == null || products.isEmpty()) {
             throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
         }
 
+        if (quantities == null || quantities.isEmpty() || quantities.size() != products.size()) {
+            throw new IllegalArgumentException("Quantities must be provided for each product.");
+        }
+
         List<InvoiceItem> invoiceItems = new ArrayList<>();
 
-        for (Product product : products) {
-            InvoiceItem invoiceItem = new InvoiceItem(product, 1);  // Assuming quantity is 1
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            Integer quantity = quantities.get(i);
+
+            if (quantity < 0) {
+                throw new IllegalArgumentException("Quantity must be non-negative for each product.");
+            }
+
+            InvoiceItem invoiceItem = new InvoiceItem(product, quantity);
             invoiceItems.add(invoiceItem);
         }
 
         return invoiceItems;
     }
 
-    private Double calculateTotalAmountRandInv(List<Product> products) {
-        // Calculate total amount by summing up the prices of products
-        return products.stream()
-                .mapToDouble(Product::getPrice)
-                .sum();
+    private Double calculateTotalAmountRandInv(List<Product> products, List<Integer> quantities) {
+        if (products == null || products.isEmpty()) {
+            throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
+        }
+
+        if (quantities == null || quantities.isEmpty() || quantities.size() != products.size()) {
+            throw new IllegalArgumentException("Quantities must be provided for each product.");
+        }
+
+        double totalAmount = 0;
+
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            Integer quantity = quantities.get(i);
+
+            if (quantity < 0) {
+                throw new IllegalArgumentException("Quantity must be non-negative for each product.");
+            }
+
+            totalAmount += product.getPrice() * quantity;
+        }
+
+        return totalAmount;
     }
 
     private List<InvoiceItem> createInvoiceItems(List<InvoiceItemRequestDTO> additionalProductDTOs) {
