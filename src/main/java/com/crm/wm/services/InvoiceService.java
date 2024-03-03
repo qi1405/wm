@@ -7,11 +7,7 @@ import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class InvoiceService {
@@ -32,6 +28,69 @@ public class InvoiceService {
         TypedQuery<InvoiceResponseDTO> query = entityManager.createQuery(jpql, InvoiceResponseDTO.class);
         query.setParameter("customerId", customerId);
         return query.getResultList();
+    }
+
+    public InvoiceDetailsDTO getInvoiceDetails(Long invoiceId) {
+        Invoice invoice = entityManager.find(Invoice.class, invoiceId);
+
+        if (invoice != null) {
+            InvoiceDetailsDTO invoiceDetailsDTO = new InvoiceDetailsDTO();
+            // Populate invoice details
+
+            // Populate customer details
+            Customer customer = invoice.getCustomer();
+            invoiceDetailsDTO.setCustomerId(customer.getCustomerID());
+            invoiceDetailsDTO.setCustomerFirstName(customer.getFirstName());
+            invoiceDetailsDTO.setCustomerLastName(customer.getLastName());
+
+            // Populate employee details
+            Employee employee = invoice.getEmployee();
+            invoiceDetailsDTO.setEmployeeId(employee.getId());
+            invoiceDetailsDTO.setEmployeeFirstName(employee.getFirstName());
+            invoiceDetailsDTO.setEmployeeLastName(employee.getLastName());
+
+            // Populate municipality details
+            Municipality municipality = invoice.getMunicipality();
+            invoiceDetailsDTO.setMunicipalityId(municipality.getMunicipalityID());
+            invoiceDetailsDTO.setMunicipalityName(municipality.getMunicipalityName());
+
+            // Populate product details
+            List<InvoiceItem> invoiceItems = invoice.getInvoiceItems();
+            if (invoiceItems != null && !invoiceItems.isEmpty()) {
+                List<ProductDetailsDTO> productDetailsList = new ArrayList<>();
+
+                for (InvoiceItem invoiceItem : invoiceItems) {
+                    Product product = invoiceItem.getProduct();
+
+                    ProductDetailsDTO productDetailsDTO = new ProductDetailsDTO();
+                    productDetailsDTO.setProductName(product.getProductName());
+                    productDetailsDTO.setProductPrice(product.getPrice());
+                    productDetailsDTO.setProductDescription(product.getDescription());
+                    productDetailsDTO.setProductQuantity(invoiceItem.getQuantity());
+
+                    productDetailsList.add(productDetailsDTO);
+                }
+
+                invoiceDetailsDTO.setProductDetailsList(productDetailsList);
+            }
+
+            // Populate company details if applicable
+            if (customer.getCustomerType() == CustomerType.COMPANY && customer.getCompany() != null) {
+                invoiceDetailsDTO.setCompanyName(customer.getCompany().getCompanyName());
+            }
+
+            // Populate other invoice details
+            invoiceDetailsDTO.setInvoiceId(invoice.getInvoiceID());
+            invoiceDetailsDTO.setInvoiceDate(invoice.getInvoiceDate());
+            invoiceDetailsDTO.setTotalAmount(invoice.getTotalAmount());
+            invoiceDetailsDTO.setMonth(invoice.getMonth());
+            invoiceDetailsDTO.setIsPaid(invoice.getIsPaid());
+
+            return invoiceDetailsDTO;
+        } else {
+            // Handle the case where the invoice with the given ID is not found
+            throw new IllegalArgumentException("Invoice with ID " + invoiceId + " not found");
+        }
     }
 
     @Transactional
@@ -153,6 +212,7 @@ public class InvoiceService {
 
         return responseDTOs;
     }
+
 
     private List<InvoiceItem> createInvoiceItemsRandInv(List<Product> products) {
         if (products == null || products.isEmpty()) {

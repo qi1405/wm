@@ -1,4 +1,4 @@
-package com.crm.wm.payload.request;
+package com.crm.wm.dto.payload.request;
 
 import jakarta.validation.constraints.NotBlank;
 

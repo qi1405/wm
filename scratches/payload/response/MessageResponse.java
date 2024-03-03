@@ -1,4 +1,4 @@
-package com.crm.wm.payload.response;
+package com.crm.wm.dto.payload.response;
 
 public class MessageResponse {
 	  private String message;

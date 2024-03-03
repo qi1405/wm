@@ -11,6 +11,7 @@ import com.crm.wm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +28,8 @@ public class CustomerController {
     private ProductRepository productRepository;
 
     // Add CRUD operations and custom endpoints
-   // @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    @PostMapping("/")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PostMapping("/create")
     public ResponseEntity<?> createCustomer(@RequestBody CustomerProductAssociationRequest request) {
         Customer customer = request.getCustomer();
         List<Long> productIds = request.getProductIds();
@@ -53,7 +54,8 @@ public class CustomerController {
         return ResponseEntity.ok("Customer saved and all products associated with the customer successfully.");
     }
 
-    @GetMapping("/all")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @GetMapping("/list")
     public ResponseEntity<List<CustomerDTO>> getAllCustomersWithProducts() {
         List<Customer> customers = customerRepository.findAll();
         List<CustomerDTO> customerDTOs = customers.stream().map(CustomerDTO::new).collect(Collectors.toList());
@@ -62,8 +64,8 @@ public class CustomerController {
 
     // Update customer details
 
-        //  @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-        @PutMapping("/{id}")
+        @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+        @PutMapping("/update/{id}")
         public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerProductAssociationRequest request) {
             // Find the customer by ID
             Optional<Customer> customerOptional = customerRepository.findById(id);

@@ -16,27 +16,27 @@ public class MunicipalityController {
     @Autowired
     MunicipalityRepository municipalityRepository;
 
-   // @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-    @PostMapping("/")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PostMapping("/create")
     public Municipality createMunicipality(@RequestBody Municipality municipality) {
         return municipalityRepository.create(municipality);
     }
 
-   // @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    @GetMapping("/")
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @GetMapping("/list")
     public List<Municipality> readAllMunicipalities() {
         return municipalityRepository.readAll();
     }
 
-  //  @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-    @PutMapping("/{municipalityID}")
+    @PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PutMapping("/update/{municipalityID}")
     public Municipality updateMunicipality(@PathVariable Long municipalityID, @RequestBody Municipality municipality) {
         municipality.setMunicipalityID(municipalityID);
         return municipalityRepository.update(municipality);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{municipalityID}")
+    @DeleteMapping("/delete/{municipalityID}")
     public String deleteMunicipality(@PathVariable Long municipalityID) {
         boolean deleted = municipalityRepository.delete(municipalityID);
 
