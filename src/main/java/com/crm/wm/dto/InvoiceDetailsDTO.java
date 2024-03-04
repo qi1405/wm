@@ -34,6 +34,7 @@ public class InvoiceDetailsDTO {
     private String productDescription;
 
     private Integer productQuantity;
+    private Double totalPrice;
 
     // Additional fields for company details if applicable
     private String companyName;

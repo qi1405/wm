@@ -8,6 +8,7 @@ public class ProductDetailsDTO {
     private Double productPrice;
     private String productDescription;
     private Integer productQuantity;
+    private Double totalPrice;
 
     // Constructors, getters, and setters
 }

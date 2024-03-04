@@ -67,6 +67,7 @@ public class InvoiceService {
                     productDetailsDTO.setProductPrice(product.getPrice());
                     productDetailsDTO.setProductDescription(product.getDescription());
                     productDetailsDTO.setProductQuantity(invoiceItem.getQuantity());
+                    productDetailsDTO.setTotalPrice(invoiceItem.getTotalPrice());
 
                     productDetailsList.add(productDetailsDTO);
                 }
