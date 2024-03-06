@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class InvoiceService {
@@ -104,8 +105,6 @@ public class InvoiceService {
             // Check if an invoice already exists for the given customer and month
             if (invoiceExistsForCustomerAndMonth(customer, requestDTO.getMonths())) {
                 // Handle the case where an invoice already exists
-                // You can throw an exception or handle it according to your business logic
-                // For example:
                 throw new IllegalArgumentException("Invoice already exists for customer " + requestDTO.getCustomerId() + " in month " + requestDTO.getMonths());
             }
 
@@ -169,14 +168,16 @@ public class InvoiceService {
             Customer customer = entityManager.find(Customer.class, requestDTO.getCustomerId());
 
             // Check if the request contains at least one product
-            if (requestDTO.getProductIds() == null || requestDTO.getProductIds().isEmpty()) {
+            if (requestDTO.getProducts() == null || requestDTO.getProducts().isEmpty()) {
                 throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
             }
 
             // Fetch products based on productIds
             List<Product> products = entityManager
                     .createQuery("SELECT p FROM Product p WHERE p.productID IN :productIds", Product.class)
-                    .setParameter("productIds", requestDTO.getProductIds())
+                    .setParameter("productIds", requestDTO.getProducts().stream()
+                            .map(InvoiceItemRequestDTO::getProductId)
+                            .collect(Collectors.toList()))
                     .getResultList();
 
             // Calculate the total amount based on the products
@@ -189,10 +190,10 @@ public class InvoiceService {
             invoice.setMunicipality(entityManager.find(Municipality.class, requestDTO.getMunicipalityId()));
             invoice.setInvoiceDate(new Date());
             invoice.setTotalAmount(totalAmount);
-            invoice.setIsPaid(false);  // Assuming it's not paid initially
+            invoice.setIsPaid(requestDTO.getIsPaid() != null ? requestDTO.getIsPaid() : false);
 
             // Create and associate InvoiceItem entities for products
-            List<InvoiceItem> productItems = createInvoiceItemsRandInv(products);
+            List<InvoiceItem> productItems = createInvoiceItemsWithQuantity(products, requestDTO.getProducts());
             productItems.forEach(item -> item.setInvoice(invoice));
 
             invoice.setInvoiceItems(productItems);
@@ -212,6 +213,23 @@ public class InvoiceService {
         }
 
         return responseDTOs;
+    }
+
+    private List<InvoiceItem> createInvoiceItemsWithQuantity(List<Product> products, List<InvoiceItemRequestDTO> productQuantityDTOs) {
+        if (products == null || products.isEmpty()) {
+            throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
+        }
+
+        List<InvoiceItem> invoiceItems = new ArrayList<>();
+
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            Integer quantity = productQuantityDTOs.get(i).getQuantity();
+            InvoiceItem invoiceItem = new InvoiceItem(product, quantity != null ? quantity : 1);
+            invoiceItems.add(invoiceItem);
+        }
+
+        return invoiceItems;
     }
 
 

@@ -8,6 +8,6 @@ public class InvoiceRequestWithoutDefaultDTO {
     private Long customerId;
     private Long employeeId;
     private Long municipalityId;
-    private List<Long> productIds;
+    private List<InvoiceItemRequestDTO> products;
     private Boolean isPaid;
 }
