@@ -7,14 +7,19 @@ import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class InvoiceService {
 
+    private final EntityManager entityManager;
+
     @Autowired
-    private EntityManager entityManager;
+    public InvoiceService(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Transactional(readOnly = true)
     public List<InvoiceResponseDTO> getAllInvoices() {
@@ -32,6 +37,70 @@ public class InvoiceService {
     }
 
     public InvoiceDetailsDTO getInvoiceDetails(Long invoiceId) {
+        Invoice invoice = entityManager.find(Invoice.class, invoiceId);
+
+        if (invoice != null) {
+            InvoiceDetailsDTO invoiceDetailsDTO = new InvoiceDetailsDTO();
+            // Populate invoice details
+
+            // Populate customer details
+            Customer customer = invoice.getCustomer();
+            invoiceDetailsDTO.setCustomerId(customer.getCustomerID());
+            invoiceDetailsDTO.setCustomerFirstName(customer.getFirstName());
+            invoiceDetailsDTO.setCustomerLastName(customer.getLastName());
+
+            // Populate employee details
+            Employee employee = invoice.getEmployee();
+            invoiceDetailsDTO.setEmployeeId(employee.getId());
+            invoiceDetailsDTO.setEmployeeFirstName(employee.getFirstName());
+            invoiceDetailsDTO.setEmployeeLastName(employee.getLastName());
+
+            // Populate municipality details
+            Municipality municipality = invoice.getMunicipality();
+            invoiceDetailsDTO.setMunicipalityId(municipality.getMunicipalityID());
+            invoiceDetailsDTO.setMunicipalityName(municipality.getMunicipalityName());
+
+            // Populate product details
+            List<InvoiceItem> invoiceItems = invoice.getInvoiceItems();
+            if (invoiceItems != null && !invoiceItems.isEmpty()) {
+                List<ProductDetailsDTO> productDetailsList = new ArrayList<>();
+
+                for (InvoiceItem invoiceItem : invoiceItems) {
+                    Product product = invoiceItem.getProduct();
+
+                    ProductDetailsDTO productDetailsDTO = new ProductDetailsDTO();
+                    productDetailsDTO.setProductName(product.getProductName());
+                    productDetailsDTO.setProductPrice(product.getPrice());
+                    productDetailsDTO.setProductDescription(product.getDescription());
+                    productDetailsDTO.setProductQuantity(invoiceItem.getQuantity());
+                    productDetailsDTO.setTotalPrice(invoiceItem.getTotalPrice());
+
+                    productDetailsList.add(productDetailsDTO);
+                }
+
+                invoiceDetailsDTO.setProductDetailsList(productDetailsList);
+            }
+
+            // Populate company details if applicable
+            if (customer.getCustomerType() == CustomerType.COMPANY && customer.getCompany() != null) {
+                invoiceDetailsDTO.setCompanyName(customer.getCompany().getCompanyName());
+            }
+
+            // Populate other invoice details
+            invoiceDetailsDTO.setInvoiceId(invoice.getInvoiceID());
+            invoiceDetailsDTO.setInvoiceDate(invoice.getInvoiceDate());
+            invoiceDetailsDTO.setTotalAmount(invoice.getTotalAmount());
+            invoiceDetailsDTO.setMonth(invoice.getMonth());
+            invoiceDetailsDTO.setIsPaid(invoice.getIsPaid());
+
+            return invoiceDetailsDTO;
+        } else {
+            // Handle the case where the invoice with the given ID is not found
+            throw new IllegalArgumentException("Invoice with ID " + invoiceId + " not found");
+        }
+    }
+
+    public InvoiceDetailsDTO getInvoiceDetailsReport(Long invoiceId) throws SQLException {
         Invoice invoice = entityManager.find(Invoice.class, invoiceId);
 
         if (invoice != null) {
@@ -226,22 +295,6 @@ public class InvoiceService {
             Product product = products.get(i);
             Integer quantity = productQuantityDTOs.get(i).getQuantity();
             InvoiceItem invoiceItem = new InvoiceItem(product, quantity != null ? quantity : 1);
-            invoiceItems.add(invoiceItem);
-        }
-
-        return invoiceItems;
-    }
-
-
-    private List<InvoiceItem> createInvoiceItemsRandInv(List<Product> products) {
-        if (products == null || products.isEmpty()) {
-            throw new IllegalArgumentException("At least one product should be involved for each invoice request.");
-        }
-
-        List<InvoiceItem> invoiceItems = new ArrayList<>();
-
-        for (Product product : products) {
-            InvoiceItem invoiceItem = new InvoiceItem(product, 1);  // Assuming quantity is 1
             invoiceItems.add(invoiceItem);
         }
 

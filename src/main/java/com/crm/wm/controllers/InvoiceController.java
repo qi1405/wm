@@ -5,10 +5,12 @@ import com.crm.wm.dto.InvoiceRequestDTO;
 import com.crm.wm.dto.InvoiceRequestWithoutDefaultDTO;
 import com.crm.wm.dto.InvoiceResponseDTO;
 import com.crm.wm.services.InvoiceService;
+import com.crm.wm.services.ReportService;
 import jakarta.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,8 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.SQLException;
 import java.util.*;
 
 @RestController
@@ -27,6 +31,9 @@ public class InvoiceController {
 
     @Autowired
     private InvoiceService invoiceService;
+
+    @Autowired
+    private ReportService reportService;
 
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     @GetMapping("/list")
@@ -70,42 +77,9 @@ public class InvoiceController {
         return new ResponseEntity<>(responseDTOs, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{invoiceId}/pdf")
-    public ResponseEntity<byte[]> getInvoiceDetailsAsPdf(@PathVariable Long invoiceId) {
-        try {
-            // Get the invoice details
-            InvoiceDetailsDTO invoiceDetails = invoiceService.getInvoiceDetails(invoiceId);
-
-            // Convert the invoice details to a list (as required by the JasperReports data source)
-            List<InvoiceDetailsDTO> detailsList = new ArrayList<>();
-            detailsList.add(invoiceDetails);
-
-            // Load the JasperReport template (assuming it's in the classpath)
-            InputStream reportStream = this.getClass().getResourceAsStream("/FirstReport.jrxml");
-            JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
-
-            // Create a data source from the invoice details
-            JRDataSource dataSource = new JRBeanCollectionDataSource(detailsList);
-
-            // Add any necessary parameters (in this case, none)
-            Map<String, Object> parameters = new HashMap<>();
-
-            // Fill the report
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
-
-            // Export the report to a PDF file
-            byte[] pdf = JasperExportManager.exportReportToPdf(jasperPrint);
-
-            // Return the PDF file
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_PDF)
-                    .header("Content-Disposition", "attachment; filename=Invoice_" + invoiceId + ".pdf")
-                    .body(pdf);
-
-        } catch (JRException e) {
-            // Handle the exception
-            throw new RuntimeException("Error generating PDF", e);
-        }
+    @GetMapping(value = "/report/{invoiceId}", produces = {"application/pdf"})
+    public ResponseEntity<byte[]> generateReport(@PathVariable Long invoiceId) throws IOException, JRException {
+        return reportService.GeneratePdfReport(invoiceId);
     }
 
 }

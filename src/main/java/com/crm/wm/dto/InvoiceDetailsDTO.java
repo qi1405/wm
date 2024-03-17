@@ -3,6 +3,7 @@ package com.crm.wm.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -29,17 +30,11 @@ public class InvoiceDetailsDTO {
 
     private String municipalityName;
 
-    private String productName;
-    private Double productPrice;
-    private String productDescription;
-
-    private Integer productQuantity;
-    private Double totalPrice;
-
     // Additional fields for company details if applicable
     private String companyName;
 
     private List<ProductDetailsDTO> productDetailsList;
 
     // Constructors, getters, and setters
+
 }
