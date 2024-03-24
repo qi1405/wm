@@ -250,7 +250,7 @@ public class InvoiceService {
                     .getResultList();
 
             // Calculate the total amount based on the products
-            Double totalAmount = calculateTotalAmountRandInv(products);
+            Double totalAmount = calculateTotalAmountRandInv(products, requestDTO.getProducts());
 
             // Create and save the invoice with the current date and time
             Invoice invoice = new Invoice();
@@ -301,11 +301,15 @@ public class InvoiceService {
         return invoiceItems;
     }
 
-    private Double calculateTotalAmountRandInv(List<Product> products) {
-        // Calculate total amount by summing up the prices of products
-        return products.stream()
-                .mapToDouble(Product::getPrice)
-                .sum();
+    private Double calculateTotalAmountRandInv(List<Product> products, List<InvoiceItemRequestDTO> productQuantityDTOs) {
+        // Calculate total amount by summing up the prices of products multiplied by their quantities
+        double totalAmount = 0.0;
+        for (int i = 0; i < products.size(); i++) {
+            Product product = products.get(i);
+            Integer quantity = productQuantityDTOs.get(i).getQuantity();
+            totalAmount += product.getPrice() * (quantity != null ? quantity : 1);
+        }
+        return totalAmount;
     }
 
     private List<InvoiceItem> createInvoiceItems(List<InvoiceItemRequestDTO> additionalProductDTOs) {
