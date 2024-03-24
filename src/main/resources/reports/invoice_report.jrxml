@@ -7,12 +7,13 @@
 	<field name="invoiceDetails.employeeFirstName" class="java.lang.String"/>
 	<field name="invoiceDetails.employeeLastName" class="java.lang.String"/>
 	<field name="invoiceDetails.municipalityName" class="java.lang.String"/>
-	<field name="productDetailsList[0].productName" class="java.lang.String"/>
-	<field name="productDetailsList[0].productDescription" class="java.lang.String"/>
-	<field name="productDetailsList[0].productPrice" class="java.lang.Double"/>
-	<field name="productDetailsList[0].productQuantity" class="java.lang.Integer"/>
-	<field name="productDetailsList[0].totalPrice" class="java.lang.Double"/>
+<!--	<field name="productDetailsList[0].productName" class="java.lang.String"/>-->
+<!--	<field name="productDetailsList[0].productDescription" class="java.lang.String"/>-->
+<!--	<field name="productDetailsList[0].productPrice" class="java.lang.Double"/>-->
+<!--	<field name="productDetailsList[0].productQuantity" class="java.lang.Integer"/>-->
+<!--	<field name="productDetailsList[0].totalPrice" class="java.lang.Double"/>-->
 	<field name="invoiceDetails.totalAmount" class="java.lang.Double"/>
+	<field name="productDetailsList" class="java.util.List"/>
 	<background>
 		<band/>
 	</background>
@@ -111,57 +112,79 @@
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="70">
+<!--		<band height="70">-->
+<!--			<line>-->
+<!--				<reportElement positionType="FixRelativeToBottom" x="0" y="-3" width="555" height="1" uuid="9e4b2957-a84b-45b2-99ed-e3d0c67034f7"/>-->
+<!--			</line>-->
+<!--			<textField>-->
+<!--				<reportElement x="0" y="4" width="111" height="20" uuid="12345678-1234-5678-5678-abcdefabcdef">-->
+<!--					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="74a99d30-7cd9-48c8-800b-d66c22c743ca"/>-->
+<!--				</reportElement>-->
+<!--				<textElement textAlignment="Center" verticalAlignment="Middle">-->
+<!--					<font size="12"/>-->
+<!--				</textElement>-->
+<!--				<textFieldExpression><![CDATA[$F{productDetailsList[0].productName}]]></textFieldExpression>-->
+<!--			</textField>-->
+<!--			<textField>-->
+<!--				<reportElement x="111" y="4" width="111" height="20" uuid="87654321-4321-5678-4321-abcdefabcdef">-->
+<!--					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ab892c84-6196-4125-8134-0cee2a7242b6"/>-->
+<!--				</reportElement>-->
+<!--				<textElement textAlignment="Center" verticalAlignment="Middle">-->
+<!--					<font size="12"/>-->
+<!--				</textElement>-->
+<!--				<textFieldExpression><![CDATA[$F{productDetailsList[0].productDescription}]]></textFieldExpression>-->
+<!--			</textField>-->
+<!--			<textField>-->
+<!--				<reportElement x="222" y="4" width="111" height="20" uuid="abababab-abab-abab-abab-abababababab">-->
+<!--					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fdf72ea0-b7dc-4516-aa1b-ad94b2673d31"/>-->
+<!--				</reportElement>-->
+<!--				<textElement textAlignment="Center" verticalAlignment="Middle">-->
+<!--					<font size="12"/>-->
+<!--				</textElement>-->
+<!--				<textFieldExpression><![CDATA[$F{productDetailsList[0].productPrice}]]></textFieldExpression>-->
+<!--			</textField>-->
+<!--			<textField>-->
+<!--				<reportElement x="333" y="4" width="111" height="20" uuid="cdcdcdcd-cdcd-cdcd-cdcd-cdcdcdcdcdcd">-->
+<!--					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3f140b88-f549-4de9-a65e-cf2eb3c37ec5"/>-->
+<!--				</reportElement>-->
+<!--				<textElement textAlignment="Center" verticalAlignment="Middle">-->
+<!--					<font size="12"/>-->
+<!--				</textElement>-->
+<!--				<textFieldExpression><![CDATA[$F{productDetailsList[0].productQuantity}]]></textFieldExpression>-->
+<!--			</textField>-->
+<!--			<textField>-->
+<!--				<reportElement x="444" y="4" width="111" height="20" uuid="efefefef-efef-efef-efef-efefefefefef">-->
+<!--					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6af18e71-a207-453d-a858-870cdabd935b"/>-->
+<!--				</reportElement>-->
+<!--				<textElement textAlignment="Center" verticalAlignment="Middle">-->
+<!--					<font size="12"/>-->
+<!--				</textElement>-->
+<!--				<textFieldExpression><![CDATA[$F{productDetailsList[0].totalPrice}]]></textFieldExpression>-->
+<!--			</textField>-->
+<!--			<textField>-->
+<!--				<reportElement x="360" y="40" width="195" height="30" uuid="83130d2c-48be-44d7-ad5a-1ad7507ceaed"/>-->
+<!--				<textElement textAlignment="Right">-->
+<!--					<font size="16" isBold="true"/>-->
+<!--				</textElement>-->
+<!--				<textFieldExpression><![CDATA["Total amount: " + $F{invoiceDetails.totalAmount}]]></textFieldExpression>-->
+<!--			</textField>-->
+<!--		</band>-->
+		<band height="106">
 			<line>
 				<reportElement positionType="FixRelativeToBottom" x="0" y="-3" width="555" height="1" uuid="9e4b2957-a84b-45b2-99ed-e3d0c67034f7"/>
 			</line>
+			<subreport>
+				<reportElement x="0" y="30" width="555" height="60" uuid="4e61bfa1-0f58-4689-8b78-4f491530f704"/>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{productDetailsList})]]></dataSourceExpression>
+				<subreportExpression><![CDATA["reports/product_report.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="42">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="-3" width="555" height="1" uuid="83af5333-69e3-4e48-bed6-cfe3d21f7531"/>
+			</line>
 			<textField>
-				<reportElement x="0" y="4" width="111" height="20" uuid="12345678-1234-5678-5678-abcdefabcdef">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="74a99d30-7cd9-48c8-800b-d66c22c743ca"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{productDetailsList[0].productName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="111" y="4" width="111" height="20" uuid="87654321-4321-5678-4321-abcdefabcdef">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ab892c84-6196-4125-8134-0cee2a7242b6"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{productDetailsList[0].productDescription}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="222" y="4" width="111" height="20" uuid="abababab-abab-abab-abab-abababababab">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fdf72ea0-b7dc-4516-aa1b-ad94b2673d31"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{productDetailsList[0].productPrice}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="333" y="4" width="111" height="20" uuid="cdcdcdcd-cdcd-cdcd-cdcd-cdcdcdcdcdcd">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="3f140b88-f549-4de9-a65e-cf2eb3c37ec5"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{productDetailsList[0].productQuantity}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="444" y="4" width="111" height="20" uuid="efefefef-efef-efef-efef-efefefefefef">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="6af18e71-a207-453d-a858-870cdabd935b"/>
-				</reportElement>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{productDetailsList[0].totalPrice}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="360" y="40" width="195" height="30" uuid="83130d2c-48be-44d7-ad5a-1ad7507ceaed"/>
+				<reportElement x="360" y="3" width="195" height="30" uuid="83130d2c-48be-44d7-ad5a-1ad7507ceaed"/>
 				<textElement textAlignment="Right">
 					<font size="16" isBold="true"/>
 				</textElement>

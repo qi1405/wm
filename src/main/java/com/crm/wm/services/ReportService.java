@@ -6,6 +6,8 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,20 @@ public class ReportService {
 
     @Autowired
     private InvoiceService invoiceService;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
+    public void compileReport() throws JRException, IOException {
+        Resource resource = resourceLoader.getResource("classpath:reports/product_report.jrxml");
+        String jasperReportPath = resource.getFile().getParent() + "/product_report.jasper";
+        JasperCompileManager.compileReportToFile(resource.getFile().getAbsolutePath(), jasperReportPath);
+    }
+
     public ResponseEntity<byte[]> GeneratePdfReport(@PathVariable Long invoiceId) throws JRException, IOException {
+
+        // Compile the subreport
+        compileReport();
 
         // Get invoice details
         InvoiceDetailsDTO invoiceDetails = invoiceService.getInvoiceDetails(invoiceId);
@@ -34,15 +49,22 @@ public class ReportService {
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(Collections.singletonList(reportData));
 
         Map<String,Object> parameters=new HashMap<>();
-//        parameters.put("createdby","JPSOLS");
+        // parameters.put("createdby","JPSOLS");
 
-        ClassPathResource classPathResource = new ClassPathResource("reports/invoice_report.jrxml");
-        InputStream inputStream = classPathResource.getInputStream();
+        // Compile the main report
+        ClassPathResource mainReportResource = new ClassPathResource("reports/invoice_report.jrxml");
+        InputStream mainReportStream = mainReportResource.getInputStream();
+        JasperReport mainReport = JasperCompileManager.compileReport(mainReportStream);
 
-        JasperReport jasperReport = JasperCompileManager
-                .compileReport(inputStream);
+        // Compile the subreport
+        ClassPathResource subReportResource = new ClassPathResource("reports/product_report.jrxml");
+        InputStream subReportStream = subReportResource.getInputStream();
+        JasperReport subReport = JasperCompileManager.compileReport(subReportStream);
 
-        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+        // Add the compiled subreport to the parameters
+        parameters.put("SubReportParameter", subReport);
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(mainReport, parameters, dataSource);
 
         byte data[] = JasperExportManager.exportReportToPdf(jasperPrint);
 
@@ -51,8 +73,7 @@ public class ReportService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "inline; filename=citiesreport.pdf");
 
-
         return ResponseEntity.ok().headers(headers).contentType(MediaType.APPLICATION_PDF).body(data);
-
     }
+
 }
