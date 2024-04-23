@@ -35,8 +35,14 @@ public class CustomerDTO {
         this.phoneNumber = customer.getPhoneNumber();
         this.address = customer.getAddress();
         this.customerType = customer.getCustomerType();
+
         if (customer.getCustomerType() == CustomerType.COMPANY && customer.getCompany() != null) {
-            this.company = new CompanyDTO(customer.getCompany());}
+            this.company = new CompanyDTO(customer.getCompany());
+        } else {
+            // Set company to null or an empty CompanyDTO instance
+            this.company = null; // or this.company = new CompanyDTO();
+        }
+
         this.municipality = new MunicipalityDTO(customer.getMunicipality());
     }
 }
