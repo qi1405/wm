@@ -12,7 +12,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
+@ToString(exclude = {"customers", "products"})
 @Entity
 @Getter
 @Setter

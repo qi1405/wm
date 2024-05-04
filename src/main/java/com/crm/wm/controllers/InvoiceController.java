@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import java.util.*;
 
 @RestController
-//@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/api/invoices")
 public class InvoiceController {
 
