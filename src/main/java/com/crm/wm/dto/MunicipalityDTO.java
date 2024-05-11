@@ -19,8 +19,13 @@ public class MunicipalityDTO {
     private String municipalityName;
 
     public MunicipalityDTO(Municipality municipality) {
-        this.municipalityID = municipality.getMunicipalityID();
-        this.municipalityName = municipality.getMunicipalityName();
+        if (municipality != null) {
+            this.municipalityID = municipality.getMunicipalityID();
+            this.municipalityName = municipality.getMunicipalityName();
+        } else {
+            this.municipalityID = null;
+            this.municipalityName = null;
+        }
     }
 
     // Constructors, getters, setters
