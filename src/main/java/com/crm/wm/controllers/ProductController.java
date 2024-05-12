@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,6 +42,18 @@ public class ProductController {
         return ResponseEntity.ok(productDTOs);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @GetMapping("/{productID}")
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productID) {
+        Optional<Product> productOptional = productRepository.findById(productID);
+        if (productOptional.isPresent()) {
+            Product product = productOptional.get();
+            ProductDTO productDTO = new ProductDTO(product);
+            return ResponseEntity.ok(productDTO);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     @PostMapping("/create")
@@ -64,32 +77,31 @@ public class ProductController {
 
         return new ResponseEntity<>("Product created successfully", HttpStatus.CREATED);
     }
+
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PutMapping("/update/{productID}")
+    public ResponseEntity<?> updateProduct(@RequestParam Long productID, @RequestBody ProductDTO productDTO) {
+        try {
+            Product existingProduct = productRepository.findById(productID).orElse(null);
+            if (existingProduct != null) {
+                // Update existing product with new data
+                existingProduct.setProductName(productDTO.getProductName());
+                existingProduct.setDescription(productDTO.getDescription());
+                existingProduct.setPrice(productDTO.getPrice());
+
+                // Update municipality if provided
+                if (productDTO.getMunicipality() != null) {
+                    // Update municipalityID only as an example
+                    existingProduct.getMunicipality().setMunicipalityID(productDTO.getMunicipality().getMunicipalityID());
+                }
+
+                productRepository.updateProduct(existingProduct); // Call the default method from repository
+                return new ResponseEntity<>("Product updated successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Product not found", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error updating product: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
-//    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-//    @GetMapping("/list/{productId}")
-//    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long productId) {
-//        ProductDTO product = productRepositoryJdbc.findById(productId);
-//        return ResponseEntity.ok(product);
-//    }
-
-//    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-//    @PutMapping("/update/{productId}")
-//    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long productId, @RequestBody ProductDTO updatedProduct) {
-//        // Perform validation or other checks as needed
-//
-//        // Set the product ID from the path variable into the updated product
-//        updatedProduct.setProductID(productId);
-//
-//        // Update the product in the database
-//        productRepositoryJdbc.update(updatedProduct);
-//
-//        // Fetch the updated product from the database
-//        ProductDTO product = productRepositoryJdbc.findById(productId);
-//
-//        return ResponseEntity.ok(product);
-//    }
-
-    // Other CRUD operations or custom endpoints as needed
-
-
+}
