@@ -105,68 +105,74 @@ public class CustomerController {
 
     // Update customer details
 
-        @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-        @PutMapping("/update/{id}")
-        public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerProductAssociationRequest request) {
-            // Find the customer by ID
-            Optional<Customer> customerOptional = customerRepository.findById(id);
-            if (customerOptional.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-            Customer customer = customerOptional.get();
+    @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerProductAssociationRequest request) {
+        // Find the customer by ID
+        Optional<Customer> customerOptional = customerRepository.findById(id);
+        if (customerOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Customer customer = customerOptional.get();
 
-            // Update the customer fields from the request
-            Customer updatedCustomer = request.getCustomer();
-            if (updatedCustomer == null) {
-                return ResponseEntity.badRequest().body("Customer details are required.");
-            }
-            customer.setFirstName(updatedCustomer.getFirstName());
-            customer.setLastName(updatedCustomer.getLastName());
-            customer.setEmail(updatedCustomer.getEmail());
-            customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
-            customer.setAddress(updatedCustomer.getAddress());
-            customer.setMunicipality(updatedCustomer.getMunicipality());
-            customer.setCustomerType(updatedCustomer.getCustomerType());
-            customer.setCompany(updatedCustomer.getCompany());
+        // Update the customer fields from the request
+        Customer updatedCustomer = request.getCustomer();
+        if (updatedCustomer == null) {
+            return ResponseEntity.badRequest().body("Customer details are required.");
+        }
+        customer.setFirstName(updatedCustomer.getFirstName());
+        customer.setLastName(updatedCustomer.getLastName());
+        customer.setEmail(updatedCustomer.getEmail());
+        customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
+        customer.setAddress(updatedCustomer.getAddress());
+        customer.setMunicipality(updatedCustomer.getMunicipality());
+        customer.setCustomerType(updatedCustomer.getCustomerType());
 
-            // Check if customer type is INDIVIDUAL and there are company details
-            if (customer.getCustomerType() == CustomerType.INDIVIDUAL && customer.getCompany() != null) {
-                return ResponseEntity.badRequest().body("Individual customer cannot have company details.");
-            }
-
-            // Fetch products by their IDs
-            List<Long> productIds = request.getProductIds();
-            List<Product> products = productRepository.findAllById(productIds);
-
-            // Associate the products with the customer
-            customer.setProducts(products);
-            customerRepository.save(customer);
-
-            // Check if customer's municipality matches the municipality of the products
-            for (Product product : products) {
-                // Log the municipalities for debugging
-//            System.out.println("Customer's municipality: " + customer.getMunicipality());
-//            System.out.println("Product's municipality: " + product.getMunicipality());
-
-                Municipality customerMunicipality = customer.getMunicipality();
-                Municipality productMunicipality = product.getMunicipality();
-
-                // Check if the municipalities are null or if their IDs are not equal
-                if (customerMunicipality == null || productMunicipality == null ||
-                        !Objects.equals(customerMunicipality.getMunicipalityID(), productMunicipality.getMunicipalityID())) {
-                    return ResponseEntity.badRequest().body("Customer's municipality must match the municipality of the products.");
-                }
-
-                // Check if the municipality names are not null and not equal
-                if (customerMunicipality.getMunicipalityName() != null &&
-                        !customerMunicipality.getMunicipalityName().equals(productMunicipality.getMunicipalityName())) {
-                    return ResponseEntity.badRequest().body("Customer's municipality name must match the municipality name of the products.");
-                }
+        // Handle Company update if the customer type is COMPANY
+        if (customer.getCustomerType() == CustomerType.COMPANY) {
+            if (updatedCustomer.getCompany() == null) {
+                return ResponseEntity.badRequest().body("Company details are required for company type customer.");
             }
 
-            return ResponseEntity.ok("Customer updated and all products associated with the customer successfully.");
+            Company existingCompany = customer.getCompany();
+            if (existingCompany == null) {
+                existingCompany = new Company();
+            }
+            existingCompany.setCompanyName(updatedCustomer.getCompany().getCompanyName());
+            existingCompany.setCustomer(customer);
+            customer.setCompany(existingCompany);
+        } else if (customer.getCustomerType() == CustomerType.INDIVIDUAL) {
+            customer.setCompany(null);
         }
 
+        // Fetch products by their IDs
+        List<Long> productIds = request.getProductIds();
+        List<Product> products = productRepository.findAllById(productIds);
 
-        // Add more endpoints as needed
+        // Associate the products with the customer
+        customer.setProducts(products);
+
+        // Check if customer's municipality matches the municipality of the products
+        for (Product product : products) {
+            Municipality customerMunicipality = customer.getMunicipality();
+            Municipality productMunicipality = product.getMunicipality();
+
+            if (customerMunicipality == null || productMunicipality == null ||
+                    !Objects.equals(customerMunicipality.getMunicipalityID(), productMunicipality.getMunicipalityID())) {
+                return ResponseEntity.badRequest().body("Customer's municipality must match the municipality of the products.");
+            }
+
+            if (customerMunicipality.getMunicipalityName() != null &&
+                    !customerMunicipality.getMunicipalityName().equals(productMunicipality.getMunicipalityName())) {
+                return ResponseEntity.badRequest().body("Customer's municipality name must match the municipality name of the products.");
+            }
+        }
+
+        customerRepository.save(customer);
+        return ResponseEntity.ok("Customer updated and all products associated with the customer successfully.");
+    }
+
+
+
+    // Add more endpoints as needed
     }
