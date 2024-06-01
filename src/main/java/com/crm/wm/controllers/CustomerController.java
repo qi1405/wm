@@ -7,7 +7,6 @@ import com.crm.wm.entities.*;
 import com.crm.wm.repository.CustomerRepository;
 import com.crm.wm.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -106,10 +105,10 @@ public class CustomerController {
     // Update customer details
 
     @PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody CustomerProductAssociationRequest request) {
+    @PutMapping("/update/{customerID}")
+    public ResponseEntity<?> updateCustomer(@PathVariable Long customerID, @RequestBody CustomerProductAssociationRequest request) {
         // Find the customer by ID
-        Optional<Customer> customerOptional = customerRepository.findById(id);
+        Optional<Customer> customerOptional = customerRepository.findById(customerID);
         if (customerOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
