@@ -21,16 +21,16 @@ public class InvoiceService {
         this.entityManager = entityManager;
     }
 
-    @Transactional(readOnly = true)
-    public List<InvoiceResponseDTO> getAllInvoices() {
-        String jpql = "SELECT NEW com.crm.wm.dto.InvoiceResponseDTO(i.invoiceID, i.invoiceDate, i.totalAmount, i.customer.customerID, i.employee.employeeID, i.month, i.municipality.municipalityID, i.isPaid) FROM Invoice i";
-        TypedQuery<InvoiceResponseDTO> query = entityManager.createQuery(jpql, InvoiceResponseDTO.class);
-        return query.getResultList();
-    }
+//    @Transactional(readOnly = true)
+//    public List<InvoiceResponseDTO> getAllInvoices() {
+//        String jpql = "SELECT NEW com.crm.wm.dto.InvoiceResponseDTO(i.invoiceID, i.invoiceDate, i.totalAmount, i.customer.customerID, i.customer.firstName, i.employee.employeeID, i.month, i.municipality.municipalityID, i.isPaid) FROM Invoice i";
+//        TypedQuery<InvoiceResponseDTO> query = entityManager.createQuery(jpql, InvoiceResponseDTO.class);
+//        return query.getResultList();
+//    }
 
     @Transactional(readOnly = true)
     public List<InvoiceResponseDTO> getInvoicesByCustomer(Long customerId) {
-        String jpql = "SELECT NEW com.crm.wm.dto.InvoiceResponseDTO(i.invoiceID, i.invoiceDate, i.totalAmount, i.customer.customerID, i.employee.employeeID, i.month, i.municipality.municipalityID, i.isPaid) FROM Invoice i WHERE i.customer.customerID = :customerId";
+        String jpql = "SELECT NEW com.crm.wm.dto.InvoiceResponseDTO(i.invoiceID, i.invoiceDate, i.totalAmount, i.customer.customerID, i.customer.firstName, i.employee.employeeID, i.month, i.municipality.municipalityID, i.isPaid) FROM Invoice i WHERE i.customer.customerID = :customerId";
         TypedQuery<InvoiceResponseDTO> query = entityManager.createQuery(jpql, InvoiceResponseDTO.class);
         query.setParameter("customerId", customerId);
         return query.getResultList();
@@ -51,7 +51,7 @@ public class InvoiceService {
 
             // Populate employee details
             Employee employee = invoice.getEmployee();
-            invoiceDetailsDTO.setEmployeeId(employee.getId());
+            invoiceDetailsDTO.setEmployeeId(employee.getEmployeeID());
             invoiceDetailsDTO.setEmployeeFirstName(employee.getFirstName());
             invoiceDetailsDTO.setEmployeeLastName(employee.getLastName());
 
@@ -115,7 +115,7 @@ public class InvoiceService {
 
             // Populate employee details
             Employee employee = invoice.getEmployee();
-            invoiceDetailsDTO.setEmployeeId(employee.getId());
+            invoiceDetailsDTO.setEmployeeId(employee.getEmployeeID());
             invoiceDetailsDTO.setEmployeeFirstName(employee.getFirstName());
             invoiceDetailsDTO.setEmployeeLastName(employee.getLastName());
 
@@ -164,6 +164,8 @@ public class InvoiceService {
         }
     }
 
+    //Generate invoices manually with the default product associated to the customer, + -->
+    //--> with the possibility to add additional products or the same product more times if needed.
     @Transactional
     public List<InvoiceResponseDTO> generateInvoices(List<InvoiceRequestDTO> requestDTOs) {
         List<InvoiceResponseDTO> responseDTOs = new ArrayList<>();
@@ -219,6 +221,7 @@ public class InvoiceService {
                     invoice.getInvoiceDate(),
                     totalAmount,
                     customer.getCustomerID(),
+                    customer.getFirstName(),
                     requestDTO.getEmployeeId(),
                     requestDTO.getMonths(),
                     requestDTO.getMunicipalityId(),
@@ -274,6 +277,7 @@ public class InvoiceService {
                     invoice.getInvoiceDate(),
                     totalAmount,
                     customer.getCustomerID(),
+                    customer.getFirstName(),
                     requestDTO.getEmployeeId(),
                     null,  // No month for this type of invoice
                     requestDTO.getMunicipalityId(),

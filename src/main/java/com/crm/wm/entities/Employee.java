@@ -49,7 +49,7 @@ public class Employee {
     this.lastName = lastName;
   }
 
-  public Long getId() {
+  public Long getEmployeeID() {
     return employeeID;
   }
 

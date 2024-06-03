@@ -15,7 +15,7 @@ public class EmployeeDTO {
     // Other fields, constructors, getters, setters as needed
 
     public EmployeeDTO(Employee employee) {
-        this.employeeID = employee.getId();
+        this.employeeID = employee.getEmployeeID();
         this.firstName = employee.getFirstName();
         this.lastName = employee.getLastName();
         this.username = employee.getUsername();

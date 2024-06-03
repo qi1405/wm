@@ -14,6 +14,7 @@ public class InvoiceResponseDTO {
     private Date invoiceDate;
     private Double totalAmount;
     private Long customerId;
+    private String customerName;
     private Long employeeId;
 //    @JsonDeserialize(using = CustomDateDeserializer.class)
     private String month;
@@ -21,11 +22,12 @@ public class InvoiceResponseDTO {
     private Boolean isPaid;
 
     // Constructor
-    public InvoiceResponseDTO(Long invoiceId, Date invoiceDate, Double totalAmount, Long customerId, Long employeeId, String months, Long municipalityId, Boolean isPaid) {
+    public InvoiceResponseDTO(Long invoiceId, Date invoiceDate, Double totalAmount, Long customerId, String customerName, Long employeeId, String months, Long municipalityId, Boolean isPaid) {
         this.invoiceId = invoiceId;
         this.invoiceDate = invoiceDate;
         this.totalAmount = totalAmount;
         this.customerId = customerId;
+        this.customerName = customerName;
         this.employeeId = employeeId;
         this.month = months;
         this.municipalityId = municipalityId;
