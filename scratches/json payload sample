@@ -59,8 +59,8 @@
 
 --> sign in:
     {
-      "username": "username",
-      "password": "password"
+      "username": "admin",
+      "password": "adminadmin"
     }
 
  --> insert invoice manually

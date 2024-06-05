@@ -165,7 +165,8 @@ public class InvoiceService {
     }
 
     //Generate invoices manually with the default product associated to the customer, + -->
-    //--> with the possibility to add additional products or the same product more times if needed.
+    //--> with the possibility to add additional products or the same product more times if needed + -->
+    //--> multiple months.
     @Transactional
     public List<InvoiceResponseDTO> generateInvoices(List<InvoiceRequestDTO> requestDTOs) {
         List<InvoiceResponseDTO> responseDTOs = new ArrayList<>();
